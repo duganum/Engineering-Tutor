@@ -9,24 +9,36 @@ st.set_page_config(page_title="Socratic Engineering Tutor", layout="wide")
 if "page" not in st.session_state: st.session_state.page = "landing"
 if "chat_sessions" not in st.session_state: st.session_state.chat_sessions = {}
 if "grading_data" not in st.session_state: st.session_state.grading_data = {}
+if "user_name" not in st.session_state: st.session_state.user_name = None
 
-# Load Problems from local JSON
 PROBLEMS = load_problems()
 
-# --- Page 1: Main Menu (Problem Selection) ---
+# --- Page 0: Name Entry ---
+if st.session_state.user_name is None:
+    st.title("🛡️ Student Access")
+    st.markdown("### Please enter your name to begin.")
+    
+    with st.form("name_form"):
+        name_input = st.text_input("Full Name")
+        submit_name = st.form_submit_button("Start Session")
+        
+        if submit_name:
+            if name_input.strip():
+                st.session_state.user_name = name_input.strip()
+                st.rerun()
+            else:
+                st.warning("Please enter your name for the academic report.")
+    st.stop()
+
+# --- Page 1: Main Menu ---
 if st.session_state.page == "landing":
-    st.title("🚀 Engineering Mechanics Socratic Tutor")
+    st.title(f"🚀 Welcome, {st.session_state.user_name}!")
     st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
-    st.markdown("""
-    Welcome! Select a problem below to begin your session. 
-    Your work will be analyzed and sent to **dugan.um@gmail.com** when you finish.
-    """)
     
     if not PROBLEMS:
-        st.error("❌ Failed to load problems. Please check 'problems.json'.")
+        st.error("❌ No problems found in 'problems.json'.")
         st.stop()
 
-    # Organize problems by category
     categories = {}
     for p in PROBLEMS:
         cat_main = p.get('category', 'General').split(":")[0].strip()
@@ -54,14 +66,13 @@ elif st.session_state.page == "chat":
     
     solved = st.session_state.grading_data[p_id]['solved']
     
-    # UI Layout
     cols = st.columns([2, 1])
     with cols[0]:
         st.subheader(f"📌 {prob['category']}")
         st.info(prob['statement'])
     with cols[1]:
         total_targets = len(prob['targets'])
-        st.metric("Variables Found", f"{len(solved)} / {total_targets}")
+        st.metric("Progress", f"{len(solved)} / {total_targets}")
         st.progress(len(solved) / total_targets if total_targets > 0 else 0)
         
         if st.button("⬅️ Finish & Send Report"):
@@ -71,8 +82,8 @@ elif st.session_state.page == "chat":
                     role = "Tutor" if msg.role == "model" else "Student"
                     history_text += f"{role}: {msg.parts[0].text}\n"
             
-            with st.spinner("Generating analysis for Dr. Um..."):
-                report = analyze_and_send_report(prob['category'], history_text)
+            with st.spinner("Calculating score and sending report..."):
+                report = analyze_and_send_report(st.session_state.user_name, prob['category'], history_text)
                 st.session_state.last_report = report
                 st.session_state.page = "report_view"
                 st.rerun()
@@ -80,36 +91,32 @@ elif st.session_state.page == "chat":
     # Initialize Gemini Chat
     if p_id not in st.session_state.chat_sessions:
         sys_prompt = (
-            f"You are a Socratic Engineering Tutor. PROBLEM: {prob['statement']}. "
-            f"Numerical Targets to find: {list(prob['targets'].keys())}. "
+            f"You are a Socratic Engineering Tutor. Student: {st.session_state.user_name}. "
+            f"PROBLEM: {prob['statement']}. Numerical Targets: {list(prob['targets'].keys())}. "
             "RULES: 1. Ask ONE guiding question at a time. 2. Never give the final answer. "
-            "3. If student is stuck, hint at Free Body Diagrams or Newton's Laws. "
-            "4. Respond ONLY in JSON: {'tutor_message': '...'}"
+            "3. Format JSON: {'tutor_message': '...'}"
         )
         model = get_gemini_model(sys_prompt)
         if model:
             try:
                 session = model.start_chat(history=[])
-                session.send_message("Introduce the problem briefly and ask the first conceptual question.")
+                session.send_message("Introduce problem and ask for the first step.")
                 st.session_state.chat_sessions[p_id] = session
             except Exception as e:
-                st.error(f"Chat Initialization Error: {e}")
+                st.error(f"API Error: {e}")
 
-    # Display Chat History
+    # Display History
     if p_id in st.session_state.chat_sessions:
         for message in st.session_state.chat_sessions[p_id].history:
-            if "Introduce the problem" in message.parts[0].text: continue
-            role = "assistant" if message.role == "model" else "user"
-            with st.chat_message(role):
+            if "Introduce problem" in message.parts[0].text: continue
+            with st.chat_message("assistant" if message.role == "model" else "user"):
                 text = message.parts[0].text
-                # Clean internal status tracking from display
                 display_text = re.sub(r'\(Internal Status:.*?\)', '', text).strip()
-                # Parse JSON message
                 match = re.search(r'"tutor_message":\s*"(.*?)"', display_text, re.DOTALL)
                 st.markdown(match.group(1) if match else display_text)
 
-    # User Input Processing
-    if user_input := st.chat_input("Type your thought or answer here..."):
+    # Input Handling
+    if user_input := st.chat_input("Enter your answer or thought..."):
         new_match = False
         for target, val in prob['targets'].items():
             if target not in solved:
@@ -117,15 +124,13 @@ elif st.session_state.page == "chat":
                     st.session_state.grading_data[p_id]['solved'].add(target)
                     new_match = True
         
-        # Pass hidden metadata to the AI to let it know if the student got a number right
-        state_info = f"\n(Internal Status: Solved={list(solved)}. NewMatch={new_match})"
-        st.session_state.chat_sessions[p_id].send_message(user_input + state_info)
+        st.session_state.chat_sessions[p_id].send_message(f"{user_input} (Internal Status: NewMatch={new_match})")
         st.rerun()
 
 # --- Page 3: Report View ---
 elif st.session_state.page == "report_view":
-    st.title("📊 Academic Achievement Report")
-    st.success("Your progress report has been successfully sent to Dr. Um.")
+    st.title("📊 Performance Report")
+    st.success(f"Report for {st.session_state.user_name} has been emailed to Dr. Um.")
     st.markdown("---")
     st.markdown(st.session_state.get("last_report", "No report available."))
     if st.button("Confirm and Return to Menu"):
