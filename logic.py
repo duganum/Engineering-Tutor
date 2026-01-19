@@ -7,17 +7,17 @@ from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
     """
-    Configures and returns the Gemini model.
-    Fixes the 'NotFound' error by using the explicit model path.
+    Configures the model using the most compatible naming convention 
+    for Python 3.13 / v1beta SDK.
     """
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # Use 'models/gemini-1.5-flash' to ensure the API finds the resource
+    # Try this specific versioned string which is more stable for Tier 1
     return genai.GenerativeModel(
-        model_name='models/gemini-1.5-flash',
+        model_name='gemini-1.5-flash-8b', 
         system_instruction=system_instruction
     )
-
+    
 def load_problems():
     """Loads problem set from the local JSON file."""
     try:
@@ -79,3 +79,4 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
     except Exception as e:
         # If this fails with (535), check the App Password for spaces
         st.error(f"Report generated, but email delivery failed: {e}")
+
