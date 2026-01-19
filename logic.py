@@ -7,11 +7,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
-    """Configures and returns the Gemini model."""
+    """Configures and returns the Gemini model using a robust model alias."""
     try:
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+        # Changed from 'models/gemini-1.5-flash-latest' to 'gemini-1.5-flash'
+        # This alias is more compatible with standard API calls
         return genai.GenerativeModel(
-            model_name='models/gemini-1.5-flash-latest', 
+            model_name='gemini-1.5-flash', 
             system_instruction=system_instruction
         )
     except Exception as e:
@@ -79,3 +81,4 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
     except Exception as e:
         st.error(f"Email failed: {e}")
         return report_text
+
