@@ -6,9 +6,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
+    """Configures and returns the Gemini model with the correct version path."""
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    
+    # Using the full path 'models/gemini-1.5-flash' often resolves NotFound errors
     return genai.GenerativeModel(
-        model_name='models/gemini-1.5-flash-latest', # Added 'models/' and '-latest'
+        model_name='models/gemini-1.5-flash', 
         system_instruction=system_instruction
     )
 
@@ -78,4 +81,5 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
     except Exception as e:
         # This catches the 535 error if the App Password is wrong or contains spaces
         st.error(f"Report generated, but email failed to send. Error: {e}")
+
 
