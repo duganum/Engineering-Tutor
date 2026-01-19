@@ -10,31 +10,45 @@ if "page" not in st.session_state: st.session_state.page = "landing"
 if "chat_sessions" not in st.session_state: st.session_state.chat_sessions = {}
 if "grading_data" not in st.session_state: st.session_state.grading_data = {}
 
+# 데이터 로드
 PROBLEMS = load_problems()
 
-# --- Page 1: 문제 선택 화면 (카테고리별 그룹화) ---
+# --- Page 1: 문제 선택 화면 ---
 if st.session_state.page == "landing":
     st.title("🚀 Engineering Mechanics Socratic Tutor")
     st.write("학습할 주제를 선택하세요. 각 섹션에는 개념 이해를 돕는 문제들이 준비되어 있습니다.")
     
-    # 카테고리별로 문제 분류
+    # [디버깅] 데이터가 없을 경우 경고 표시
+    if not PROBLEMS:
+        st.error("❌ 문제를 불러올 수 없습니다. 'problems.json' 파일이 GitHub에 있는지, 혹은 JSON 형식이 맞는지 확인하세요.")
+        st.stop()
+
+    # 카테고리별로 문제 분류 (예외 처리 강화)
     categories = {}
     for p in PROBLEMS:
-        cat_main = p['category'].split(":")[0]  # "Statics" 또는 "Kinematics" 추출
+        full_cat = p.get('category', 'General: Unknown')
+        if ":" in full_cat:
+            cat_main = full_cat.split(":")[0].strip()
+        else:
+            cat_main = full_cat  # 콜론이 없는 경우 전체를 대분류로 사용
+
         if cat_main not in categories:
             categories[cat_main] = []
         categories[cat_main].append(p)
 
-    # 카테고리별로 레이아웃 배치
+    # 카테고리별 레이아웃 렌더링
     for cat_name, probs in categories.items():
         st.header(cat_name)
-        # 3열로 문제 버튼 배치
         cols = st.columns(3)
         for idx, prob in enumerate(probs):
             with cols[idx % 3]:
-                # 버튼에 소제목 표시 (예: 1.1 Free Body Diagram)
-                sub_cat = prob['category'].split(":")[1] if ":" in prob['category'] else ""
-                if st.button(f"{sub_cat}\n\nProblem {prob['id']}", key=prob['id'], use_container_width=True):
+                # 소제목 추출 안전하게 처리
+                full_cat = prob.get('category', '')
+                sub_cat = full_cat.split(":")[1].strip() if ":" in full_cat else "Problem"
+                
+                # 버튼 생성
+                btn_label = f"**{sub_cat}**\n\nID: {prob['id']}"
+                if st.button(btn_label, key=f"btn_{prob['id']}", use_container_width=True):
                     st.session_state.current_prob = prob
                     st.session_state.page = "chat"
                     st.rerun()
@@ -49,14 +63,13 @@ elif st.session_state.page == "chat":
     
     solved = list(st.session_state.grading_data[p_id]['solved'])
     
-    # 1. 시스템 프롬프트 (수정된 targets 대응)
+    # 1. 시스템 프롬프트
     sys_prompt = (
         f"You are a Socratic Engineering Tutor. PROBLEM: {prob['statement']}. "
-        f"Target values to find: {list(prob['targets'].keys())}. "
-        f"So far, the student found: {solved}. "
-        "RULES: 1. Ask one guiding question at a time. 2. Focus on the concept first. "
-        "3. If a student gives a correct numeric answer, acknowledge it and move to the next step. "
-        "4. Respond ONLY in JSON: {'tutor_message': '...'}"
+        f"Target values: {list(prob['targets'].keys())}. "
+        f"Found so far: {solved}. "
+        "RULES: 1. Ask ONE guiding question at a time. 2. Focus on the concept/FBD first. "
+        "3. NEVER provide the final answer first. 4. Respond ONLY in JSON: {'tutor_message': '...'}"
     )
 
     # 2. 채팅 세션 초기화
@@ -68,7 +81,9 @@ elif st.session_state.page == "chat":
                 session.send_message("Introduce the problem briefly and ask the first conceptual question.")
                 st.session_state.chat_sessions[p_id] = session
             except Exception as e:
-                st.error(f"Connection failed: {e}")
+                st.error(f"AI 연결 실패: {e}")
+        else:
+            st.error("모델 초기화에 실패했습니다.")
 
     # UI 헤더
     cols = st.columns([2, 1])
@@ -76,9 +91,10 @@ elif st.session_state.page == "chat":
         st.subheader(f"📌 {prob['category']}")
         st.info(prob['statement'])
     with cols[1]:
-        progress = len(solved) / len(prob['targets'])
-        st.metric("Progress", f"{len(solved)} / {len(prob['targets'])}")
-        st.progress(progress)
+        total_targets = len(prob['targets'])
+        current_done = len(solved)
+        st.metric("Progress", f"{current_done} / {total_targets}")
+        st.progress(current_done / total_targets if total_targets > 0 else 0)
         if st.button("⬅️ Back to Menu"):
             st.session_state.page = "landing"
             st.rerun()
@@ -94,24 +110,24 @@ elif st.session_state.page == "chat":
                 match = re.search(r'"tutor_message":\s*"(.*?)"', display_text, re.DOTALL)
                 st.markdown(match.group(1) if match else display_text)
 
-    # 4. 사용자 입력 및 정답 체크
-    if user_input := st.chat_input("답변을 입력하세요 (예: 39.24)..."):
+    # 4. 사용자 입력 처리
+    if user_input := st.chat_input("의견이나 정답을 입력하세요..."):
         with st.chat_message("user"):
             st.markdown(user_input)
         
-        # 정답 체크 로직
-        new_solved = False
+        # 정답 체크
+        new_match = False
         for target, val in prob['targets'].items():
             if target not in st.session_state.grading_data[p_id]['solved']:
                 if check_numeric_match(user_input, val):
                     st.session_state.grading_data[p_id]['solved'].add(target)
-                    new_solved = True
+                    new_match = True
 
         with st.chat_message("assistant"):
             try:
-                current_solved = list(st.session_state.grading_data[p_id]['solved'])
-                state_info = f"\n(Internal Status: Solved={current_solved}. New match={new_solved})"
+                solved_list = list(st.session_state.grading_data[p_id]['solved'])
+                state_info = f"\n(Internal Status: Solved={solved_list}. NewMatch={new_match})"
                 st.session_state.chat_sessions[p_id].send_message(user_input + state_info)
                 st.rerun()
             except Exception:
-                st.error("Gemini와 연결이 끊겼습니다.")
+                st.error("Gemini 응답 생성 중 오류가 발생했습니다.")
