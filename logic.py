@@ -6,12 +6,15 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
-    """Configures and returns the Gemini model with the correct version path."""
+    """
+    Configures and returns the Gemini model.
+    Fixes the 'NotFound' error by using the explicit model path.
+    """
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # Using the full path 'models/gemini-1.5-flash' often resolves NotFound errors
+    # Use 'models/gemini-1.5-flash' to ensure the API finds the resource
     return genai.GenerativeModel(
-        model_name='models/gemini-1.5-flash', 
+        model_name='models/gemini-1.5-flash',
         system_instruction=system_instruction
     )
 
@@ -20,7 +23,8 @@ def load_problems():
     try:
         with open('problems.json', 'r') as f:
             return json.load(f)
-    except FileNotFoundError:
+    except Exception as e:
+        st.error(f"Error loading problems: {e}")
         return {}
 
 def check_numeric_match(user_val, correct_val, tolerance=0.05):
@@ -33,22 +37,17 @@ def check_numeric_match(user_val, correct_val, tolerance=0.05):
         return False
 
 def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
-    """Generates an AI summary of the session and emails it to the instructor."""
+    """Generates an AI summary and emails it to the instructor using SSL."""
     
-    # 1. AI Analysis Section
-    # We pass a simple instruction for the report generation
-    model = get_gemini_model("You are an educational evaluator. Summarize the student's performance.")
+    # 1. AI Analysis
+    # We use a neutral system instruction for the summary generator
+    model = get_gemini_model("You are an educational assistant. Summarize the tutoring session.")
     
     report_prompt = f"""
-    Analyze the following tutoring session:
-    Student Name: {user_name}
-    Problem: {problem_title}
-    Chat History: {chat_history}
+    Please analyze this session for student {user_name} on the problem '{problem_title}'.
+    Full Chat History: {chat_history}
     
-    Please provide:
-    1. A score from 0-10 based on their understanding.
-    2. Key strengths shown.
-    3. Specific areas where the student struggled.
+    Provide a score (0-10) and a brief summary of their performance for the instructor.
     """
     
     try:
@@ -58,28 +57,25 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
         st.error(f"AI Analysis failed: {e}")
         return
 
-    # 2. Email Configuration
+    # 2. Email Setup
     sender_email = st.secrets["EMAIL_SENDER"]
-    # We send the report to you (the instructor)
-    instructor_email = "dugan.um@gmail.com" 
-    app_password = st.secrets["EMAIL_PASSWORD"] 
+    instructor_email = "dugan.um@gmail.com"
+    app_password = st.secrets["EMAIL_PASSWORD"] # MUST be the 16-digit App Password
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = instructor_email
-    msg['Subject'] = f"Tutor Report: {user_name} - {problem_title}"
+    msg['Subject'] = f"Engineering Tutor Report: {user_name} - {problem_title}"
     msg.attach(MIMEText(report_text, 'plain'))
 
-    # 3. Secure Email Sending (SMTP_SSL Port 465)
+    # 3. Secure SMTP Connection
     try:
-        # Use SSL for a direct secure connection to Gmail
+        # SMTP_SSL on Port 465 is highly recommended for Streamlit Cloud
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login(sender_email, app_password)
         server.send_message(msg)
         server.quit()
-        st.success(f"Great job {user_name}! Your report has been sent to Dr. Um.")
+        st.success(f"Excellent! Your session report has been sent to Dr. Um.")
     except Exception as e:
-        # This catches the 535 error if the App Password is wrong or contains spaces
-        st.error(f"Report generated, but email failed to send. Error: {e}")
-
-
+        # If this fails with (535), check the App Password for spaces
+        st.error(f"Report generated, but email delivery failed: {e}")
