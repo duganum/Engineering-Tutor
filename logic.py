@@ -7,21 +7,23 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
-    """Configures and returns the Gemini model using a robust model alias."""
+    """Configures and returns the Gemini model using the stable alias."""
     try:
-        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        # Changed from 'models/gemini-1.5-flash-latest' to 'gemini-1.5-flash'
-        # This alias is more compatible with standard API calls
+        # Fetch key from Streamlit Secrets
+        api_key = st.secrets["GEMINI_API_KEY"]
+        genai.configure(api_key=api_key)
+        
+        # Use 'gemini-1.5-flash' - it is the most compatible string for v1beta endpoints
         return genai.GenerativeModel(
             model_name='gemini-1.5-flash', 
             system_instruction=system_instruction
         )
     except Exception as e:
-        st.error(f"Model Configuration Error: {e}")
+        st.error(f"Failed to initialize Gemini: {e}")
         return None
 
 def load_problems():
-    """Loads problems from the local JSON file."""
+    """Loads problems from problems.json."""
     try:
         with open('problems.json', 'r') as f:
             return json.load(f)
@@ -30,9 +32,9 @@ def load_problems():
         return []
 
 def check_numeric_match(user_val, correct_val, tolerance=0.05):
-    """Extracts numbers from string and checks within 5% tolerance."""
+    """Checks if the user's numeric answer is within tolerance."""
     try:
-        # Use regex to find the first number (integer or float) in the string
+        # Extract digits/decimals only in case student adds units (e.g., '5 m/s')
         u_match = re.search(r"[-+]?\d*\.\d+|\d+", str(user_val))
         if not u_match:
             return False
@@ -40,28 +42,25 @@ def check_numeric_match(user_val, correct_val, tolerance=0.05):
         u = float(u_match.group())
         c = float(correct_val)
         
-        if c == 0:
-            return abs(u) < tolerance
+        if c == 0: return abs(u) < tolerance
         return abs(u - c) <= abs(tolerance * c)
-    except (ValueError, TypeError, AttributeError):
+    except:
         return False
 
 def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
-    """Generates AI summary and sends email via SSL."""
-    
-    model = get_gemini_model("You are an academic evaluator. Summarize the student's performance.")
+    """Generates summary and emails it."""
+    model = get_gemini_model("You are a professor evaluating a student's Socratic tutoring session.")
     if not model:
-        return "Error: Could not initialize AI for reporting."
+        return "AI Analysis Unavailable"
 
-    report_prompt = f"Analyze session for {user_name} ({user_email}) on problem: {problem_title}. History: {chat_history}"
+    prompt = f"Student: {user_name}\nProblem: {problem_title}\n\nChat History:\n{chat_history}"
     
     try:
-        response = model.generate_content(report_prompt)
+        response = model.generate_content(prompt)
         report_text = response.text
-    except Exception as e:
-        report_text = f"AI Analysis failed, but session completed. Error: {e}"
+    except:
+        report_text = "Analysis failed, but session was recorded."
 
-    # Email Logic
     sender = st.secrets["EMAIL_SENDER"]
     password = st.secrets["EMAIL_PASSWORD"] 
     receiver = "dugan.um@gmail.com"
@@ -69,7 +68,7 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = receiver
-    msg['Subject'] = f"Engineering Tutor Report: {user_name}"
+    msg['Subject'] = f"Tutor Report: {user_name}"
     msg.attach(MIMEText(report_text, 'plain'))
 
     try:
@@ -77,8 +76,7 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
         server.login(sender, password)
         server.send_message(msg)
         server.quit()
-        return report_text
     except Exception as e:
-        st.error(f"Email failed: {e}")
-        return report_text
-
+        st.error(f"Email error: {e}")
+    
+    return report_text
