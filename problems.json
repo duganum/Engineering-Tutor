@@ -1,0 +1,16 @@
+[
+    {
+        "id": "PROB_01",
+        "category": "Newton's Laws",
+        "statement": "A 10 kg crate is pulled by 100 N on a horizontal surface. $\\mu_k = 0.4$. Find friction force ($f_k$) and acceleration ($a$). Use $g = 9.81 m/s^2$.",
+        "targets": {"f_k": 39.24, "a": 6.08},
+        "required_units": ["n", "m/s^2", "m/s2"]
+    },
+    {
+        "id": "PROB_02",
+        "category": "Work & Energy",
+        "statement": "A 2 kg block is released from rest at the top of a 5 m tall frictionless incline. Find Potential Energy ($PE$) at the top and velocity ($v$) at the bottom. Use $g = 9.81 m/s^2$.",
+        "targets": {"PE": 98.1, "v": 9.90},
+        "required_units": ["j", "m/s"]
+    }
+]
