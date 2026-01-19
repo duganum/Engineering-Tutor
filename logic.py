@@ -6,15 +6,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
-    """
-    Configures the Gemini model. 
-    The 'models/' prefix is MANDATORY to fix the NotFound error in v1beta.
-    """
+    # 1. Configure the API Key
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # Updated model string to be explicitly versioned
+    # 2. Use the versioned model string
+    # Sometimes 'gemini-1.5-flash' alias fails, but this exact version succeeds
     return genai.GenerativeModel(
-        model_name='models/gemini-1.5-flash',
+        model_name='models/gemini-1.5-flash-latest', 
         system_instruction=system_instruction
     )
 
@@ -70,3 +68,4 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
         st.success("Report emailed to Dr. Um!")
     except Exception as e:
         st.error(f"Email failed (Error 535? Check App Password): {e}")
+
