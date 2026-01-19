@@ -5,48 +5,49 @@ from logic import get_gemini_model, load_problems, check_numeric_match, analyze_
 
 st.set_page_config(page_title="Socratic Engineering Tutor", layout="wide")
 
-# 1. 세션 상태 초기화
+# 1. Initialize Session State
 if "page" not in st.session_state: st.session_state.page = "landing"
 if "chat_sessions" not in st.session_state: st.session_state.chat_sessions = {}
 if "grading_data" not in st.session_state: st.session_state.grading_data = {}
 if "user_info" not in st.session_state: st.session_state.user_info = None
 
-# 데이터 로드
+# Load Problems
 PROBLEMS = load_problems()
 
-# --- Page 0: 사용자 정보 입력 (최초 1회) ---
+# --- Page 0: Student Registration ---
 if st.session_state.user_info is None:
     st.title("🛡️ Student Registration")
-    st.markdown("### Welcome to Engineering Mechanics Tutor")
+    st.markdown("### Welcome to the Engineering Mechanics Tutor")
     st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
     
     with st.form("registration_form"):
-        u_name = st.text_input("Full Name (성함)")
-        u_email = st.text_input("Email Address (이메일)")
+        u_name = st.text_input("Full Name")
+        u_email = st.text_input("Email Address")
         submit = st.form_submit_button("Start Tutoring")
         if submit:
             if u_name and u_email:
                 st.session_state.user_info = {"name": u_name, "email": u_email}
                 st.rerun()
             else:
-                st.warning("Please enter both name and email.")
+                st.warning("Please enter both your name and email address.")
     st.stop()
 
-# --- Page 1: 메인 메뉴 (문제 선택 화면) ---
+# --- Page 1: Main Menu (Problem Selection) ---
 if st.session_state.page == "landing":
     st.title("🚀 Engineering Mechanics Socratic Tutor")
     st.markdown(f"""
     ### Welcome, **{st.session_state.user_info['name']}**!
     This is a **free engineering tutor** developed by **Dr. Dugan Um** at **TAMUCC**.
     
-    학습할 주제를 선택하세요. 진행 과정과 AI 분석 리포트는 **dugan.um@gmail.com**으로 자동 전송됩니다.
+    Please select a topic below. Your progress and AI-generated analysis will be 
+    automatically sent to **dugan.um@gmail.com** for assessment.
     """)
     
     if not PROBLEMS:
-        st.error("❌ 문제를 불러올 수 없습니다. 'problems.json' 파일 형식을 확인하세요.")
+        st.error("❌ Failed to load problems. Please check 'problems.json'.")
         st.stop()
 
-    # 카테고리별 분류
+    # Categorize Problems
     categories = {}
     for p in PROBLEMS:
         full_cat = p.get('category', 'General: Unknown')
@@ -54,7 +55,7 @@ if st.session_state.page == "landing":
         if cat_main not in categories: categories[cat_main] = []
         categories[cat_main].append(p)
 
-    # UI 렌더링
+    # Render UI
     for cat_name, probs in categories.items():
         st.header(cat_name)
         cols = st.columns(3)
@@ -66,7 +67,7 @@ if st.session_state.page == "landing":
                     st.session_state.page = "chat"
                     st.rerun()
 
-# --- Page 2: 소크라테스식 대화 화면 ---
+# --- Page 2: Socratic Chat Interface ---
 elif st.session_state.page == "chat":
     prob = st.session_state.current_prob
     p_id = prob['id']
@@ -76,7 +77,7 @@ elif st.session_state.page == "chat":
     
     solved = list(st.session_state.grading_data[p_id]['solved'])
     
-    # UI 헤더
+    # UI Header
     cols = st.columns([2, 1])
     with cols[0]:
         st.subheader(f"📌 {prob['category']}")
@@ -94,7 +95,7 @@ elif st.session_state.page == "chat":
                     role = "Tutor" if msg.role == "model" else "Student"
                     history_text += f"{role}: {msg.parts[0].text}\n"
             
-            with st.spinner("AI가 분석 리포트를 생성하여 교수님께 전송 중입니다..."):
+            with st.spinner("Analyzing your progress and sending report to Dr. Um..."):
                 report = analyze_and_send_report(
                     st.session_state.user_info['name'],
                     st.session_state.user_info['email'],
@@ -105,13 +106,13 @@ elif st.session_state.page == "chat":
                 st.session_state.page = "report_view"
                 st.rerun()
 
-    # 채팅 세션 초기화
+    # Initialize Chat Session
     if p_id not in st.session_state.chat_sessions:
         sys_prompt = (
             f"You are a Socratic Engineering Tutor. PROBLEM: {prob['statement']}. "
             f"Targets: {list(prob['targets'].keys())}. Found: {solved}. "
             "RULES: 1. Ask ONE guiding question at a time. 2. Focus on concepts/FBD first. "
-            "3. Response ONLY in JSON: {'tutor_message': '...'}"
+            "3. Response ONLY in JSON format: {'tutor_message': '...'}"
         )
         model = get_gemini_model(sys_prompt)
         if model:
@@ -119,7 +120,7 @@ elif st.session_state.page == "chat":
             session.send_message("Introduce the problem briefly and ask the first conceptual question.")
             st.session_state.chat_sessions[p_id] = session
 
-    # 채팅 히스토리 표시
+    # Display Chat History
     if p_id in st.session_state.chat_sessions:
         for message in st.session_state.chat_sessions[p_id].history:
             if "Introduce the problem" in message.parts[0].text: continue
@@ -130,8 +131,8 @@ elif st.session_state.page == "chat":
                 match = re.search(r'"tutor_message":\s*"(.*?)"', display_text, re.DOTALL)
                 st.markdown(match.group(1) if match else display_text)
 
-    # 입력 처리
-    if user_input := st.chat_input("의견이나 정답을 입력하세요..."):
+    # Input Handling
+    if user_input := st.chat_input("Type your thought or answer here..."):
         with st.chat_message("user"): st.markdown(user_input)
         new_match = False
         for target, val in prob['targets'].items():
@@ -146,10 +147,10 @@ elif st.session_state.page == "chat":
             st.session_state.chat_sessions[p_id].send_message(user_input + state_info)
             st.rerun()
 
-# --- Page 3: 리포트 출력 화면 ---
+# --- Page 3: Report View ---
 elif st.session_state.page == "report_view":
     st.title("📊 Academic Achievement Report")
-    st.success("리포트가 Dugan Um 교수님께 전송되었습니다.")
+    st.success("Your progress report has been successfully sent to Dr. Dugan Um.")
     st.markdown("---")
     st.markdown(st.session_state.get("last_report", "No report available."))
     if st.button("Confirm and Return to Menu"):
