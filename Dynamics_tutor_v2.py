@@ -29,7 +29,9 @@ elif st.session_state.page == "chat":
     p_id = prob['id']
 
     # 1. State-aware Prompting
-    solved = list(st.session_state.grading_data.get(p_id, {}).get('solved', []))
+    # grading_data[p_id]가 없을 경우를 대비해 안전하게 가져오기
+    current_grading = st.session_state.grading_data.get(p_id, {'solved': set()})
+    solved = list(current_grading.get('solved', []))
     remaining = [t for t in prob['targets'].keys() if t not in solved]
     
     sys_prompt = (
@@ -45,6 +47,7 @@ elif st.session_state.page == "chat":
         if model:
             session = model.start_chat(history=[])
             st.session_state.chat_sessions[p_id] = session
+            # p_id 키를 명확히 생성
             st.session_state.grading_data[p_id] = {'solved': set()}
             # Proactively trigger the first message
             session.send_message("Introduce the problem and ask for the first step.")
@@ -62,21 +65,16 @@ elif st.session_state.page == "chat":
             st.session_state.page = "landing"
             st.rerun()
 
-    # 3. Display History (Cleaned for the student)
+    # 3. Display History
     if p_id in st.session_state.chat_sessions:
         for message in st.session_state.chat_sessions[p_id].history:
-            # Skip the hidden "trigger" message
             if "Introduce the problem" in message.parts[0].text:
                 continue
                 
             role = "assistant" if message.role == "model" else "user"
             with st.chat_message(role):
                 text = message.parts[0].text
-                
-                # CLEANING: Remove (Internal Status...) from user bubbles
                 display_text = re.sub(r'\(Internal Status:.*?\)', '', text).strip()
-                
-                # PARSING: Extract only the message from the JSON brackets
                 match = re.search(r'"tutor_message":\s*"(.*?)"', display_text, re.DOTALL)
                 if match:
                     st.markdown(match.group(1))
@@ -88,17 +86,21 @@ elif st.session_state.page == "chat":
         with st.chat_message("user"):
             st.markdown(user_input)
         
-        # Check for numeric progress in the background
+        # Check for numeric progress (에러 발생 구간 수정)
+        if p_id not in st.session_state.grading_data:
+            st.session_state.grading_data[p_id] = {'solved': set()}
+
         for target, val in prob['targets'].items():
             if check_numeric_match(user_input, val):
                 st.session_state.grading_data[p_id]['solved'].add(target)
 
         # Update Gemini on current "State" and get response
         with st.chat_message("assistant"):
-            state_info = f"\n(Internal Status: Solved={list(st.session_state.grading_data[p_id]['solved'])})"
+            # 안전하게 solved 리스트 추출
+            solved_list = list(st.session_state.grading_data[p_id]['solved'])
+            state_info = f"\n(Internal Status: Solved={solved_list})"
             try:
                 response = st.session_state.chat_sessions[p_id].send_message(user_input + state_info)
-                # Clean and parse the response
                 json_match = re.search(r'"tutor_message":\s*"(.*?)"', response.text, re.DOTALL)
                 msg = json_match.group(1) if json_match else response.text
                 st.markdown(msg)
