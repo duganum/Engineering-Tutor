@@ -7,15 +7,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
-    """Configures and returns the Gemini model using the fully qualified model name."""
+    """Configures and returns the Gemini model using verified 2.0-flash string."""
     try:
         api_key = st.secrets["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
         
-        # Using the fully qualified name 'models/gemini-1.5-flash'
-        # This is the most reliable string for v1beta calls.
+        # Updated to gemini-2.0-flash based on your diagnostic results
         return genai.GenerativeModel(
-            model_name='models/gemini-1.5-flash', 
+            model_name='models/gemini-2.0-flash', 
             system_instruction=system_instruction
         )
     except Exception as e:
@@ -32,8 +31,9 @@ def load_problems():
         return []
 
 def check_numeric_match(user_val, correct_val, tolerance=0.05):
-    """Checks if the user's numeric answer is within tolerance."""
+    """Extracts numbers and checks if answer is within 5% tolerance."""
     try:
+        # Regex to find numbers even if units (m/s, N) are included
         u_match = re.search(r"[-+]?\d*\.\d+|\d+", str(user_val))
         if not u_match:
             return False
@@ -41,36 +41,35 @@ def check_numeric_match(user_val, correct_val, tolerance=0.05):
         u = float(u_match.group())
         c = float(correct_val)
         
-        if c == 0: return abs(u) < tolerance
+        if c == 0: 
+            return abs(u) < tolerance
         return abs(u - c) <= abs(tolerance * c)
-    except:
+    except (ValueError, TypeError, AttributeError):
         return False
 
 def analyze_and_send_report(problem_title, chat_history):
-    """Generates summary and emails it to Dr. Um."""
+    """Generates AI summary and emails it directly to Dr. Um."""
     model = get_gemini_model("You are a professor evaluating a student's Socratic tutoring session.")
     if not model:
         return "AI Analysis Unavailable"
 
-    # Hardcoded student name since registration is removed
-    user_name = "Engineering Student"
-    prompt = f"Student: {user_name}\nProblem: {problem_title}\n\nChat History:\n{chat_history}"
+    prompt = f"Problem Topic: {problem_title}\n\nFull Chat History:\n{chat_history}"
     
     try:
         response = model.generate_content(prompt)
         report_text = response.text
     except:
-        report_text = "Analysis failed, but session was recorded."
+        report_text = "Analysis generation failed, but session record exists."
 
+    # Email credentials from st.secrets
     sender = st.secrets["EMAIL_SENDER"]
     password = st.secrets["EMAIL_PASSWORD"] 
-    # Hardcoded receiver
-    receiver = "dugan.um@gmail.com"
+    receiver = "dugan.um@gmail.com" # Hardcoded per request
 
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = receiver
-    msg['Subject'] = f"Engineering Tutor Report: {problem_title}"
+    msg['Subject'] = f"Dynamics Tutor Report: {problem_title}"
     msg.attach(MIMEText(report_text, 'plain'))
 
     try:
@@ -79,7 +78,6 @@ def analyze_and_send_report(problem_title, chat_history):
         server.send_message(msg)
         server.quit()
     except Exception as e:
-        st.error(f"Email error: {e}")
+        st.error(f"Email failed (Check App Password): {e}")
     
     return report_text
-
