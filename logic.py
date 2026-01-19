@@ -5,52 +5,80 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-def get_gemini_model():
-    # Uses the "Tier 1" key you just set up
+def get_gemini_model(system_instruction):
+    """
+    Configures and returns the Gemini model.
+    Accepts system_instruction as required by Dynamics_tutor_v2.py line 117.
+    """
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    return genai.GenerativeModel('gemini-1.5-flash')
+    return genai.GenerativeModel(
+        model_name='gemini-1.5-flash',
+        system_instruction=system_instruction
+    )
 
 def load_problems():
-    with open('problems.json', 'r') as f:
-        return json.load(f)
+    """Loads problem set from the local JSON file."""
+    try:
+        with open('problems.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
 
 def check_numeric_match(user_val, correct_val, tolerance=0.05):
+    """Checks if the student's answer is within a 5% margin of error."""
     try:
         u = float(user_val)
         c = float(correct_val)
         return abs(u - c) <= abs(tolerance * c)
-    except:
+    except (ValueError, TypeError):
         return False
 
 def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
-    # 1. Generate Report with Gemini
-    model = get_gemini_model()
-    prompt = f"Analyze this tutoring session for {user_name} on {problem_title}. History: {chat_history}. Summarize score (0-10) and feedback."
+    """Generates an AI summary of the session and emails it to the instructor."""
+    
+    # 1. AI Analysis Section
+    # We pass a simple instruction for the report generation
+    model = get_gemini_model("You are an educational evaluator. Summarize the student's performance.")
+    
+    report_prompt = f"""
+    Analyze the following tutoring session:
+    Student Name: {user_name}
+    Problem: {problem_title}
+    Chat History: {chat_history}
+    
+    Please provide:
+    1. A score from 0-10 based on their understanding.
+    2. Key strengths shown.
+    3. Specific areas where the student struggled.
+    """
     
     try:
-        response = model.generate_content(prompt)
+        response = model.generate_content(report_prompt)
         report_text = response.text
     except Exception as e:
         st.error(f"AI Analysis failed: {e}")
         return
 
-    # 2. Send Email using the 16-digit App Password
+    # 2. Email Configuration
     sender_email = st.secrets["EMAIL_SENDER"]
-    receiver_email = "dugan.um@gmail.com" # Your copy
-    password = st.secrets["EMAIL_PASSWORD"] # This MUST be the 16-digit App Password
+    # We send the report to you (the instructor)
+    instructor_email = "dugan.um@gmail.com" 
+    app_password = st.secrets["EMAIL_PASSWORD"] 
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
-    msg['To'] = receiver_email
-    msg['Subject'] = f"Engineering Report: {user_name} - {problem_title}"
+    msg['To'] = instructor_email
+    msg['Subject'] = f"Tutor Report: {user_name} - {problem_title}"
     msg.attach(MIMEText(report_text, 'plain'))
 
+    # 3. Secure Email Sending (SMTP_SSL Port 465)
     try:
-        # Port 465 is the "Golden Standard" for Streamlit + Gmail
+        # Use SSL for a direct secure connection to Gmail
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login(sender_email, password)
+        server.login(sender_email, app_password)
         server.send_message(msg)
         server.quit()
-        st.success("Report generated and emailed successfully!")
+        st.success(f"Great job {user_name}! Your report has been sent to Dr. Um.")
     except Exception as e:
-        st.error(f"Report generated but email failed: {e}")
+        # This catches the 535 error if the App Password is wrong or contains spaces
+        st.error(f"Report generated, but email failed to send. Error: {e}")
