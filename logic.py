@@ -7,48 +7,41 @@ from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
     """
-    Configures the model using the most compatible naming convention 
-    for Python 3.13 / v1beta SDK.
+    Configures the Gemini model. 
+    The 'models/' prefix is MANDATORY to fix the NotFound error in v1beta.
     """
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # Try this specific versioned string which is more stable for Tier 1
+    # Updated model string to be explicitly versioned
     return genai.GenerativeModel(
-        model_name='gemini-1.5-flash-8b', 
+        model_name='models/gemini-1.5-flash',
         system_instruction=system_instruction
     )
-    
+
 def load_problems():
-    """Loads problem set from the local JSON file."""
+    """Loads problems from the local JSON file."""
     try:
         with open('problems.json', 'r') as f:
             return json.load(f)
     except Exception as e:
-        st.error(f"Error loading problems: {e}")
+        st.error(f"Error loading problems.json: {e}")
         return {}
 
 def check_numeric_match(user_val, correct_val, tolerance=0.05):
-    """Checks if the student's answer is within a 5% margin of error."""
+    """Checks if answer is within 5% tolerance."""
     try:
-        u = float(user_val)
-        c = float(correct_val)
+        u, c = float(user_val), float(correct_val)
         return abs(u - c) <= abs(tolerance * c)
     except (ValueError, TypeError):
         return False
 
 def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
-    """Generates an AI summary and emails it to the instructor using SSL."""
+    """Generates AI summary and sends email via SSL Port 465."""
     
-    # 1. AI Analysis
-    # We use a neutral system instruction for the summary generator
-    model = get_gemini_model("You are an educational assistant. Summarize the tutoring session.")
+    # Use the same model setup for the report
+    model = get_gemini_model("Summarize this student's physics problem-solving session.")
     
-    report_prompt = f"""
-    Please analyze this session for student {user_name} on the problem '{problem_title}'.
-    Full Chat History: {chat_history}
-    
-    Provide a score (0-10) and a brief summary of their performance for the instructor.
-    """
+    report_prompt = f"Analyze session for {user_name} on {problem_title}. History: {chat_history}"
     
     try:
         response = model.generate_content(report_prompt)
@@ -57,26 +50,23 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
         st.error(f"AI Analysis failed: {e}")
         return
 
-    # 2. Email Setup
-    sender_email = st.secrets["EMAIL_SENDER"]
-    instructor_email = "dugan.um@gmail.com"
-    app_password = st.secrets["EMAIL_PASSWORD"] # MUST be the 16-digit App Password
+    # Email Logic
+    sender = st.secrets["EMAIL_SENDER"]
+    password = st.secrets["EMAIL_PASSWORD"] # 16-digit App Password, no spaces
+    receiver = "dugan.um@gmail.com"
 
     msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = instructor_email
-    msg['Subject'] = f"Engineering Tutor Report: {user_name} - {problem_title}"
+    msg['From'] = sender
+    msg['To'] = receiver
+    msg['Subject'] = f"Engineering Report: {user_name}"
     msg.attach(MIMEText(report_text, 'plain'))
 
-    # 3. Secure SMTP Connection
     try:
-        # SMTP_SSL on Port 465 is highly recommended for Streamlit Cloud
+        # SSL connection is the most stable for Streamlit
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login(sender_email, app_password)
+        server.login(sender, password)
         server.send_message(msg)
         server.quit()
-        st.success(f"Excellent! Your session report has been sent to Dr. Um.")
+        st.success("Report emailed to Dr. Um!")
     except Exception as e:
-        # If this fails with (535), check the App Password for spaces
-        st.error(f"Report generated, but email delivery failed: {e}")
-
+        st.error(f"Email failed (Error 535? Check App Password): {e}")
