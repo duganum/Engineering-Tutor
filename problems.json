@@ -1,16 +1,170 @@
 [
     {
-        "id": "PROB_01",
-        "category": "Newton's Laws",
-        "statement": "A 10 kg crate is pulled by 100 N on a horizontal surface. $\\mu_k = 0.4$. Find friction force ($f_k$) and acceleration ($a$). Use $g = 9.81 m/s^2$.",
-        "targets": {"f_k": 39.24, "a": 6.08},
-        "required_units": ["n", "m/s^2", "m/s2"]
+        "id": "S_1.1_1",
+        "category": "Statics: Free Body Diagram",
+        "statement": "A 50 kg mass is suspended by two cables. Cable A is horizontal, and Cable B is at 45 degrees. Find the Tension in Cable B ($T_B$). Use $g = 9.81 m/s^2$.",
+        "targets": {"T_B": 693.67},
+        "required_units": ["n"]
     },
     {
-        "id": "PROB_02",
-        "category": "Work & Energy",
-        "statement": "A 2 kg block is released from rest at the top of a 5 m tall frictionless incline. Find Potential Energy ($PE$) at the top and velocity ($v$) at the bottom. Use $g = 9.81 m/s^2$.",
-        "targets": {"PE": 98.1, "v": 9.90},
-        "required_units": ["j", "m/s"]
+        "id": "S_1.1_2",
+        "category": "Statics: Free Body Diagram",
+        "statement": "A 20 kg cylinder rests on a smooth 30-degree incline. Find the Normal Force ($N$) acting on the cylinder.",
+        "targets": {"N": 169.91},
+        "required_units": ["n"]
+    },
+    {
+        "id": "S_1.1_3",
+        "category": "Statics: Free Body Diagram",
+        "statement": "A uniform 10 kg beam is supported by a pin at A and a cable at B. Find the vertical Reaction Force at A ($A_y$).",
+        "targets": {"A_y": 49.05},
+        "required_units": ["n"]
+    },
+    {
+        "id": "S_1.2_1",
+        "category": "Statics: Truss",
+        "statement": "In a simple bridge truss, a vertical load of 10 kN is applied at the center. If the truss is symmetric, find the Support Reaction ($R$) at one end.",
+        "targets": {"R": 5000},
+        "required_units": ["n", "kn"]
+    },
+    {
+        "id": "S_1.2_2",
+        "category": "Statics: Truss",
+        "statement": "For a triangle truss with 60-degree angles and a 5 kN load at the top vertex, find the Force in the horizontal member ($F_{AB}$).",
+        "targets": {"F_{AB}": 1.44},
+        "required_units": ["kn", "n"]
+    },
+    {
+        "id": "S_1.2_3",
+        "category": "Statics: Truss",
+        "statement": "Identify the number of Zero-Force Members in a Pratt truss under a single point load at the support.",
+        "targets": {"ZFM": 2},
+        "required_units": [""]
+    },
+    {
+        "id": "S_1.3_1",
+        "category": "Statics: Geometric Properties",
+        "statement": "Find the Centroid ($\bar{y}$) of a rectangle with base 4 m and height 6 m relative to the base.",
+        "targets": {"y": 3.0},
+        "required_units": ["m"]
+    },
+    {
+        "id": "S_1.3_2",
+        "category": "Statics: Geometric Properties",
+        "statement": "Calculate the Area Moment of Inertia ($I_x$) for a square section with side length $a = 0.2 m$.",
+        "targets": {"I_x": 0.000133},
+        "required_units": ["m^4", "m4"]
+    },
+    {
+        "id": "S_1.3_3",
+        "category": "Statics: Geometric Properties",
+        "statement": "Find the Area of a circle with a diameter of 0.5 m.",
+        "targets": {"Area": 0.196},
+        "required_units": ["m^2", "m2"]
+    },
+    {
+        "id": "S_1.4_1",
+        "category": "Statics: Equilibrium",
+        "statement": "A rigid bar is balanced on a pivot. A 10 N force is 2 m left of the pivot. What Force ($F$) is needed 4 m right of the pivot to maintain equilibrium?",
+        "targets": {"F": 5.0},
+        "required_units": ["n"]
+    },
+    {
+        "id": "S_1.4_2",
+        "category": "Statics: Equilibrium",
+        "statement": "Find the Moment ($M$) at the fixed support of a 3 m cantilever beam with a 100 N downward force at the tip.",
+        "targets": {"M": 300.0},
+        "required_units": ["nm"]
+    },
+    {
+        "id": "S_1.4_3",
+        "category": "Statics: Equilibrium",
+        "statement": "Two people carry a 60 kg log. Person A is at one end, Person B is 1/3 from the other end. Find Force ($F_B$).",
+        "targets": {"F_B": 441.45},
+        "required_units": ["n"]
+    },
+    {
+        "id": "K_2.1_1",
+        "category": "Kinematics: Rectilinear Motion",
+        "statement": "A car accelerates from rest at $2 m/s^2$. Find its Velocity ($v$) after 10 seconds.",
+        "targets": {"v": 20.0},
+        "required_units": ["m/s"]
+    },
+    {
+        "id": "K_2.1_2",
+        "category": "Kinematics: Rectilinear Motion",
+        "statement": "A particle moves with $s(t) = 3t^2 + 2t$. Find the Acceleration ($a$) at $t = 5 s$.",
+        "targets": {"a": 6.0},
+        "required_units": ["m/s^2", "m/s2"]
+    },
+    {
+        "id": "K_2.1_3",
+        "category": "Kinematics: Rectilinear Motion",
+        "statement": "How much Distance ($d$) is required to stop a vehicle traveling at 30 m/s with a deceleration of $5 m/s^2$?",
+        "targets": {"d": 90.0},
+        "required_units": ["m"]
+    },
+    {
+        "id": "K_2.2_1",
+        "category": "Kinematics: Projectile Motion",
+        "statement": "A ball is kicked at 20 m/s at an angle of 45 degrees. Find the Maximum Height ($H$). Use $g = 9.81 m/s^2$.",
+        "targets": {"H": 10.19},
+        "required_units": ["m"]
+    },
+    {
+        "id": "K_2.2_2",
+        "category": "Kinematics: Projectile Motion",
+        "statement": "For the same ball (20 m/s, 45 deg), find the horizontal Range ($R$).",
+        "targets": {"R": 40.77},
+        "required_units": ["m"]
+    },
+    {
+        "id": "K_2.2_3",
+        "category": "Kinematics: Projectile Motion",
+        "statement": "A projectile is fired horizontally from a 50 m cliff at 10 m/s. Find the Time of flight ($t$).",
+        "targets": {"t": 3.19},
+        "required_units": ["s"]
+    },
+    {
+        "id": "K_2.3_1",
+        "category": "Kinematics: Normal & Tangent",
+        "statement": "A car travels on a circular track of radius 100 m at a constant speed of 20 m/s. Find the Normal Acceleration ($a_n$).",
+        "targets": {"a_n": 4.0},
+        "required_units": ["m/s^2", "m/s2"]
+    },
+    {
+        "id": "K_2.3_2",
+        "category": "Kinematics: Normal & Tangent",
+        "statement": "If the car in the previous problem increases speed at $2 m/s^2$, find the Total Acceleration ($a_{total}$).",
+        "targets": {"a_total": 4.47},
+        "required_units": ["m/s^2", "m/s2"]
+    },
+    {
+        "id": "K_2.3_3",
+        "category": "Kinematics: Normal & Tangent",
+        "statement": "A particle moves on a path where $\rho = 50 m$. At a certain point, $a_n = 8 m/s^2$. Find the Velocity ($v$).",
+        "targets": {"v": 20.0},
+        "required_units": ["m/s"]
+    },
+    {
+        "id": "K_2.4_1",
+        "category": "Kinematics: Polar Coordinates",
+        "statement": "A robotic arm extends at $\dot{r} = 0.5 m/s$ while rotating at $\dot{\theta} = 2 rad/s$. If $r = 1 m$, find the radial Velocity ($v_r$).",
+        "targets": {"v_r": 0.5},
+        "required_units": ["m/s"]
+    },
+    {
+        "id": "K_2.4_2",
+        "category": "Kinematics: Polar Coordinates",
+        "statement": "Using the same arm ($r=1, \dot{r}=0.5, \dot{\theta}=2$), find the transverse Velocity ($v_{\theta}$).",
+        "targets": {"v_theta": 2.0},
+        "required_units": ["m/s"]
+    },
+    {
+        "id": "K_2.4_3",
+        "category": "Kinematics: Polar Coordinates",
+        "statement": "A particle moves such that $r = 2 m$ (constant) and $\dot{\theta} = 3 rad/s$. Find the Magnitude of Acceleration ($a$).",
+        "targets": {"a": 18.0},
+        "required_units": ["m/s^2", "m/s2"]
     }
 ]
