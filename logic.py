@@ -7,13 +7,15 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def get_gemini_model(system_instruction):
-    """Configures and returns the Gemini model using the stable alias."""
+    """Configures and returns the Gemini model using the fully qualified model name."""
     try:
         api_key = st.secrets["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
         
+        # Using the fully qualified name 'models/gemini-1.5-flash'
+        # This is the most reliable string for v1beta calls.
         return genai.GenerativeModel(
-            model_name='gemini-1.5-flash', 
+            model_name='models/gemini-1.5-flash', 
             system_instruction=system_instruction
         )
     except Exception as e:
@@ -80,3 +82,4 @@ def analyze_and_send_report(problem_title, chat_history):
         st.error(f"Email error: {e}")
     
     return report_text
+
