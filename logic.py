@@ -9,11 +9,9 @@ from email.mime.multipart import MIMEMultipart
 def get_gemini_model(system_instruction):
     """Configures and returns the Gemini model using the stable alias."""
     try:
-        # Fetch key from Streamlit Secrets
         api_key = st.secrets["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
         
-        # Use 'gemini-1.5-flash' - it is the most compatible string for v1beta endpoints
         return genai.GenerativeModel(
             model_name='gemini-1.5-flash', 
             system_instruction=system_instruction
@@ -34,7 +32,6 @@ def load_problems():
 def check_numeric_match(user_val, correct_val, tolerance=0.05):
     """Checks if the user's numeric answer is within tolerance."""
     try:
-        # Extract digits/decimals only in case student adds units (e.g., '5 m/s')
         u_match = re.search(r"[-+]?\d*\.\d+|\d+", str(user_val))
         if not u_match:
             return False
@@ -47,12 +44,14 @@ def check_numeric_match(user_val, correct_val, tolerance=0.05):
     except:
         return False
 
-def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
-    """Generates summary and emails it."""
+def analyze_and_send_report(problem_title, chat_history):
+    """Generates summary and emails it to Dr. Um."""
     model = get_gemini_model("You are a professor evaluating a student's Socratic tutoring session.")
     if not model:
         return "AI Analysis Unavailable"
 
+    # Hardcoded student name since registration is removed
+    user_name = "Engineering Student"
     prompt = f"Student: {user_name}\nProblem: {problem_title}\n\nChat History:\n{chat_history}"
     
     try:
@@ -63,12 +62,13 @@ def analyze_and_send_report(user_name, user_email, problem_title, chat_history):
 
     sender = st.secrets["EMAIL_SENDER"]
     password = st.secrets["EMAIL_PASSWORD"] 
+    # Hardcoded receiver
     receiver = "dugan.um@gmail.com"
 
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = receiver
-    msg['Subject'] = f"Tutor Report: {user_name}"
+    msg['Subject'] = f"Engineering Tutor Report: {problem_title}"
     msg.attach(MIMEText(report_text, 'plain'))
 
     try:
