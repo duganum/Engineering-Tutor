@@ -12,7 +12,6 @@ def get_gemini_model(system_instruction):
         api_key = st.secrets["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
         
-        # Updated to gemini-2.0-flash based on your diagnostic results
         return genai.GenerativeModel(
             model_name='models/gemini-2.0-flash', 
             system_instruction=system_instruction
@@ -33,7 +32,6 @@ def load_problems():
 def check_numeric_match(user_val, correct_val, tolerance=0.05):
     """Extracts numbers and checks if answer is within 5% tolerance."""
     try:
-        # Regex to find numbers even if units (m/s, N) are included
         u_match = re.search(r"[-+]?\d*\.\d+|\d+", str(user_val))
         if not u_match:
             return False
@@ -47,13 +45,25 @@ def check_numeric_match(user_val, correct_val, tolerance=0.05):
     except (ValueError, TypeError, AttributeError):
         return False
 
-def analyze_and_send_report(problem_title, chat_history):
-    """Generates AI summary and emails it directly to Dr. Um."""
-    model = get_gemini_model("You are a professor evaluating a student's Socratic tutoring session.")
+def analyze_and_send_report(user_name, problem_title, chat_history):
+    """Generates AI summary with an Achievement Score and emails it to Dr. Um."""
+    # Updated instruction to include scoring
+    report_instruction = (
+        "You are an academic evaluator. Analyze the student's Socratic tutoring session. "
+        "Provide a summary of their conceptual understanding and assign an 'Achievement Score' "
+        "from 0 to 10 based on their progress and accuracy."
+    )
+    
+    model = get_gemini_model(report_instruction)
     if not model:
         return "AI Analysis Unavailable"
 
-    prompt = f"Problem Topic: {problem_title}\n\nFull Chat History:\n{chat_history}"
+    prompt = (
+        f"Student Name: {user_name}\n"
+        f"Problem Topic: {problem_title}\n\n"
+        f"Full Chat History:\n{chat_history}\n\n"
+        "Please include a clear section titled 'ACHIEVEMENT SCORE: X/10' at the top of your report."
+    )
     
     try:
         response = model.generate_content(prompt)
@@ -61,15 +71,14 @@ def analyze_and_send_report(problem_title, chat_history):
     except:
         report_text = "Analysis generation failed, but session record exists."
 
-    # Email credentials from st.secrets
     sender = st.secrets["EMAIL_SENDER"]
     password = st.secrets["EMAIL_PASSWORD"] 
-    receiver = "dugan.um@gmail.com" # Hardcoded per request
+    receiver = "dugan.um@gmail.com" 
 
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = receiver
-    msg['Subject'] = f"Dynamics Tutor Report: {problem_title}"
+    msg['Subject'] = f"Dynamics Report ({user_name}): {problem_title}"
     msg.attach(MIMEText(report_text, 'plain'))
 
     try:
@@ -78,6 +87,6 @@ def analyze_and_send_report(problem_title, chat_history):
         server.send_message(msg)
         server.quit()
     except Exception as e:
-        st.error(f"Email failed (Check App Password): {e}")
+        st.error(f"Email failed: {e}")
     
     return report_text
