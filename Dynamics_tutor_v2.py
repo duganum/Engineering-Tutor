@@ -1,31 +1,133 @@
 import streamlit as st
-import google.generativeai as genai
+import json
+import re
+from logic import get_gemini_model, load_problems, check_numeric_match, analyze_and_send_report
 
-st.title("🔑 API Key Diagnostic Tool")
+st.set_page_config(page_title="Socratic Engineering Tutor", layout="wide")
 
-try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-    genai.configure(api_key=api_key)
+# Initialize Session State
+if "page" not in st.session_state: st.session_state.page = "landing"
+if "chat_sessions" not in st.session_state: st.session_state.chat_sessions = {}
+if "grading_data" not in st.session_state: st.session_state.grading_data = {}
+
+# Load Problems from local JSON
+PROBLEMS = load_problems()
+
+# --- Page 1: Main Menu (Problem Selection) ---
+if st.session_state.page == "landing":
+    st.title("🚀 Engineering Mechanics Socratic Tutor")
+    st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
+    st.markdown("""
+    Welcome! Select a problem below to begin your session. 
+    Your work will be analyzed and sent to **dugan.um@gmail.com** when you finish.
+    """)
     
-    st.write("### Checking Available Models...")
-    available_models = []
-    for m in genai.list_models():
-        if 'generateContent' in m.supported_generation_methods:
-            available_models.append(m.name)
+    if not PROBLEMS:
+        st.error("❌ Failed to load problems. Please check 'problems.json'.")
+        st.stop()
+
+    # Organize problems by category
+    categories = {}
+    for p in PROBLEMS:
+        cat_main = p.get('category', 'General').split(":")[0].strip()
+        if cat_main not in categories: categories[cat_main] = []
+        categories[cat_main].append(p)
+
+    for cat_name, probs in categories.items():
+        st.header(cat_name)
+        cols = st.columns(3)
+        for idx, prob in enumerate(probs):
+            with cols[idx % 3]:
+                sub_label = prob.get('category', '').split(":")[-1].strip()
+                if st.button(f"**{sub_label}**\n\nID: {prob['id']}", key=f"btn_{prob['id']}", use_container_width=True):
+                    st.session_state.current_prob = prob
+                    st.session_state.page = "chat"
+                    st.rerun()
+
+# --- Page 2: Socratic Chat Interface ---
+elif st.session_state.page == "chat":
+    prob = st.session_state.current_prob
+    p_id = prob['id']
+
+    if p_id not in st.session_state.grading_data:
+        st.session_state.grading_data[p_id] = {'solved': set()}
     
-    if available_models:
-        st.success(f"Successfully connected! Your key can see {len(available_models)} models.")
-        st.write("Available Model Strings (use one of these in logic.py):")
-        st.code(available_models)
+    solved = st.session_state.grading_data[p_id]['solved']
+    
+    # UI Layout
+    cols = st.columns([2, 1])
+    with cols[0]:
+        st.subheader(f"📌 {prob['category']}")
+        st.info(prob['statement'])
+    with cols[1]:
+        total_targets = len(prob['targets'])
+        st.metric("Variables Found", f"{len(solved)} / {total_targets}")
+        st.progress(len(solved) / total_targets if total_targets > 0 else 0)
         
-        # Test a simple generation
-        st.write("### Testing Generation...")
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content("Hello, are you active?")
-        st.info(f"Test Response: {response.text}")
-    else:
-        st.warning("Connected, but no models found. Check your API project permissions.")
+        if st.button("⬅️ Finish & Send Report"):
+            history_text = ""
+            if p_id in st.session_state.chat_sessions:
+                for msg in st.session_state.chat_sessions[p_id].history:
+                    role = "Tutor" if msg.role == "model" else "Student"
+                    history_text += f"{role}: {msg.parts[0].text}\n"
+            
+            with st.spinner("Generating analysis for Dr. Um..."):
+                report = analyze_and_send_report(prob['category'], history_text)
+                st.session_state.last_report = report
+                st.session_state.page = "report_view"
+                st.rerun()
 
-except Exception as e:
-    st.error(f"Diagnostic Failed: {e}")
-    st.write("This usually means the API Key is invalid or the 'Generative Language API' is not enabled in Google Cloud Console.")
+    # Initialize Gemini Chat
+    if p_id not in st.session_state.chat_sessions:
+        sys_prompt = (
+            f"You are a Socratic Engineering Tutor. PROBLEM: {prob['statement']}. "
+            f"Numerical Targets to find: {list(prob['targets'].keys())}. "
+            "RULES: 1. Ask ONE guiding question at a time. 2. Never give the final answer. "
+            "3. If student is stuck, hint at Free Body Diagrams or Newton's Laws. "
+            "4. Respond ONLY in JSON: {'tutor_message': '...'}"
+        )
+        model = get_gemini_model(sys_prompt)
+        if model:
+            try:
+                session = model.start_chat(history=[])
+                session.send_message("Introduce the problem briefly and ask the first conceptual question.")
+                st.session_state.chat_sessions[p_id] = session
+            except Exception as e:
+                st.error(f"Chat Initialization Error: {e}")
+
+    # Display Chat History
+    if p_id in st.session_state.chat_sessions:
+        for message in st.session_state.chat_sessions[p_id].history:
+            if "Introduce the problem" in message.parts[0].text: continue
+            role = "assistant" if message.role == "model" else "user"
+            with st.chat_message(role):
+                text = message.parts[0].text
+                # Clean internal status tracking from display
+                display_text = re.sub(r'\(Internal Status:.*?\)', '', text).strip()
+                # Parse JSON message
+                match = re.search(r'"tutor_message":\s*"(.*?)"', display_text, re.DOTALL)
+                st.markdown(match.group(1) if match else display_text)
+
+    # User Input Processing
+    if user_input := st.chat_input("Type your thought or answer here..."):
+        new_match = False
+        for target, val in prob['targets'].items():
+            if target not in solved:
+                if check_numeric_match(user_input, val):
+                    st.session_state.grading_data[p_id]['solved'].add(target)
+                    new_match = True
+        
+        # Pass hidden metadata to the AI to let it know if the student got a number right
+        state_info = f"\n(Internal Status: Solved={list(solved)}. NewMatch={new_match})"
+        st.session_state.chat_sessions[p_id].send_message(user_input + state_info)
+        st.rerun()
+
+# --- Page 3: Report View ---
+elif st.session_state.page == "report_view":
+    st.title("📊 Academic Achievement Report")
+    st.success("Your progress report has been successfully sent to Dr. Um.")
+    st.markdown("---")
+    st.markdown(st.session_state.get("last_report", "No report available."))
+    if st.button("Confirm and Return to Menu"):
+        st.session_state.page = "landing"
+        st.rerun()
