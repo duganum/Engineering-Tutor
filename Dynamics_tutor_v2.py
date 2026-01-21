@@ -148,7 +148,7 @@ elif st.session_state.page == "chat":
 # --- Page 3: Report & Score View ---
 elif st.session_state.page == "report_view":
     st.title("📊 Achievement & Analysis")
-    st.success(f"Report for {st.session_state.user_name} has been emailed to dugan.um@gmail.com.")
+    st.success(f"Report for {st.session_state.user_name} has been emailed to Dr. Dugan Um. If you have any questions regarding this AI tutor, please contact him at dugan.um@gmail.com")
     st.markdown("---")
     st.markdown(st.session_state.get("last_report", "No report available."))
     
@@ -156,3 +156,4 @@ elif st.session_state.page == "report_view":
         # Reset current session data if they want to try another problem
         st.session_state.page = "landing"
         st.rerun()
+
