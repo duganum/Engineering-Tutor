@@ -31,38 +31,37 @@ if st.session_state.user_name is None:
                 st.warning("Identification is required for academic reporting.")
     st.stop()
 
-# --- Page 1: Main Menu (Restored Statics & Unified Button Sizes) ---
+# --- Page 1: Main Menu (Full Statics & Kinematics Grid) ---
 if st.session_state.page == "landing":
     st.title(f"🚀 Welcome, {st.session_state.user_name}!")
     st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
     st.markdown("---")
 
-    # Define all topics including Statics and Kinematics
-    # Prefix IDs are mapped to your problems_v2_GitHub.json
+    # This list includes every category in your current curriculum
     all_categories = [
         {"name": "Equilibrium of Particles", "id_prefix": "S_1.1", "is_lecture": False},
         {"name": "Truss Analysis", "id_prefix": "S_1.2", "is_lecture": False},
+        {"name": "Centroids & Geometry", "id_prefix": "S_1.3", "is_lecture": False},
+        {"name": "Moments & Beams", "id_prefix": "S_1.4", "is_lecture": False},
         {"name": "Projectile Motion", "id_prefix": "K_2.2", "is_lecture": True},
         {"name": "Normal & Tangent", "id_prefix": "K_2.3", "is_lecture": True},
         {"name": "Polar Coordinates", "id_prefix": "K_2.4", "is_lecture": True}
     ]
 
     for cat in all_categories:
-        # Using equal ratios [1, 1, 1, 1] ensures all columns (and buttons) are identical in size
+        # Uniform 4-column grid: [Lecture/Label, Prob1, Prob2, Prob3]
         col_lec, col1, col2, col3 = st.columns([1, 1, 1, 1])
         
-        # Column 1: Lecture Button (or Category Label if no lecture agent exists)
         with col_lec:
             if cat["is_lecture"]:
                 if st.button(f"🎓 Lecture:\n\n{cat['name']}", key=f"lec_{cat['id_prefix']}", use_container_width=True):
                     st.session_state.lecture_topic = cat['name']
-                    st.session_state.page = "lecture"
-                    st.rerun()
+                    st.session_state.page = "lecture"; st.rerun()
             else:
-                # For Statics categories without a dedicated lecture agent, we use a disabled button for UI symmetry
-                st.button(f"🏛️ Category:\n\n{cat['name']}", key=f"stat_lab_{cat['id_prefix']}", use_container_width=True, disabled=True)
+                # Statics categories (No lecture agent yet)
+                st.button(f"🏛️ Statics:\n\n{cat['name']}", key=f"label_{cat['id_prefix']}", use_container_width=True, disabled=True)
         
-        # Columns 2-4: Problems associated with this prefix
+        # Filter problems matching this specific ID prefix (e.g., S_1.1_1, S_1.1_2, etc.)
         row_probs = [p for p in PROBLEMS if p['id'].startswith(cat['id_prefix'])]
         problem_cols = [col1, col2, col3]
         
@@ -71,23 +70,19 @@ if st.session_state.page == "landing":
                 if i < len(row_probs):
                     prob = row_probs[i]
                     sub_label = prob.get('category', '').split(":")[-1].strip()
-                    # Unified size: Multi-line strings help keep button heights consistent
                     if st.button(f"**{sub_label}**\n\nID: {prob['id']}", key=f"btn_{prob['id']}", use_container_width=True):
                         st.session_state.current_prob = prob
-                        st.session_state.page = "chat"
-                        st.rerun()
+                        st.session_state.page = "chat"; st.rerun()
                 else:
-                    # Empty button to maintain the grid structure if fewer than 3 problems exist
-                    st.button("---", key=f"empty_{cat['id_prefix']}_{i}", use_container_width=True, disabled=True)
+                    # Placeholder to keep the grid perfectly aligned
+                    st.button(" ", key=f"blank_{cat['id_prefix']}_{i}", use_container_width=True, disabled=True)
         st.markdown("---")
 
-# --- Rest of the logic (Page 2: Chat, Page 3: Lecture, Page 4: Report) remains the same ---
-# (Ensuring Page 3 still handles the Dot Product Proof in English)
+# --- Page Logic for Chat, Lecture, and Reports remains intact ---
 elif st.session_state.page == "chat":
     prob = st.session_state.current_prob
     p_id = prob['id']
-    if p_id not in st.session_state.grading_data:
-        st.session_state.grading_data[p_id] = {'solved': set()}
+    if p_id not in st.session_state.grading_data: st.session_state.grading_data[p_id] = {'solved': set()}
     solved = st.session_state.grading_data[p_id]['solved']
     cols = st.columns([2, 1])
     with cols[0]:
@@ -111,10 +106,11 @@ elif st.session_state.page == "chat":
                 st.session_state.page = "report_view"; st.rerun()
 
     if p_id not in st.session_state.chat_sessions:
-        sys_prompt = f"You are a Socratic Tutor. Problem: {prob['statement']}. Speak English."
+        sys_prompt = f"You are a Socratic Tutor for {st.session_state.user_name}. Topic: {prob['category']}. Lead in English."
         model = get_gemini_model(sys_prompt)
         st.session_state.chat_sessions[p_id] = model.start_chat(history=[])
-        st.session_state.chat_sessions[p_id].send_message("Let's begin. How do we start?")
+        st.session_state.chat_sessions[p_id].send_message("Let's look at the free body diagram. Where should we start?")
+
     for message in st.session_state.chat_sessions[p_id].history:
         with st.chat_message("assistant" if message.role == "model" else "user"):
             st.markdown(re.sub(r'\(Internal Status:.*?\)', '', message.parts[0].text).strip())
@@ -147,7 +143,7 @@ elif st.session_state.page == "lecture":
             sys_msg = f"You are a Professor at TAMUCC. Topic: {topic}. English only. Use the Dot Product Proof for Normal Acceleration."
             model = get_gemini_model(sys_msg)
             st.session_state.lecture_session = model.start_chat(history=[])
-            st.session_state.lecture_session.send_message("Hello! Ready to derive these formulas?")
+            st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}! Ready to derive the formulas for {topic}?")
         for msg in st.session_state.lecture_session.history:
             with st.chat_message("assistant" if msg.role == "model" else "user"):
                 st.write(msg.parts[0].text)
@@ -155,6 +151,6 @@ elif st.session_state.page == "lecture":
             st.session_state.lecture_session.send_message(lecture_input); st.rerun()
 
 elif st.session_state.page == "report_view":
-    st.title("📊 Report")
-    st.markdown(st.session_state.get("last_report", ""))
+    st.title("📊 Report Summary")
+    st.markdown(st.session_state.get("last_report", "No report available."))
     if st.button("Return"): st.session_state.page = "landing"; st.rerun()
