@@ -160,8 +160,10 @@ elif st.session_state.page == "lecture":
         if "lecture_session" not in st.session_state or st.session_state.lecture_session is None:
             sys_msg = (
                 f"You are a Physics Professor at TAMUCC. Topic: {topic}. "
-                "STRICT INSTRUCTION: Respond only in English. Help students understand "
-                "formulas like an = v^2/rho by asking guiding questions about the sliders."
+                "STRICT INSTRUCTION: Respond only in English. "
+                "When writing formulas, ALWAYS use LaTeX format with double dollar signs (e.g., $$a_n = v^2/\\rho$$) "
+                "so that Streamlit can render them correctly. "
+                "Explain the derivation of velocity and acceleration interactively."
             )
             model = get_gemini_model(sys_msg)
             st.session_state.lecture_session = model.start_chat(history=[])
