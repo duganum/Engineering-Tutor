@@ -18,9 +18,8 @@ def render_problem_diagram(prob_id):
             ax.annotate('', xy=(1.2, 1.2), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', lw=2, color='green'))
             ax.annotate('', xy=(0, -1.5), xytext=(0, 0), arrowprops=dict(arrowstyle='->', lw=2, color='red'))
             found = True
-        # Add other statics cases as needed...
 
-    # 2. Kinematics Logic (Image Loading)
+    # 2. Kinematics Logic (Image Loading from local folder)
     elif pid.startswith("K"):
         try:
             clean_name = pid.replace("_", "").replace(".", "").lower()
@@ -46,7 +45,7 @@ def render_problem_diagram(prob_id):
     return buf
 
 def render_lecture_visual(topic, params=None):
-    """Visualizes velocity and acceleration components for interactive English lectures."""
+    """Visualizes derivation components for interactive English lectures."""
     fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
     
     if topic == "Projectile Motion":
@@ -56,8 +55,8 @@ def render_lecture_visual(topic, params=None):
         t = np.linspace(0, t_flight, 100)
         x = v0 * np.cos(theta) * t
         y = v0 * np.sin(theta) * t - 0.5 * g * t**2
-        ax.plot(x, y, 'g-', lw=2, label='Path')
-        ax.set_title(f"Projectile: v0={v0}m/s, θ={angle}°")
+        ax.plot(x, y, 'g-', lw=2)
+        ax.set_title(f"Projectile Path Analysis (v0={v0}, angle={angle})")
 
     elif topic == "Normal & Tangent":
         v, rho = params.get('v', 20), params.get('rho', 50)
@@ -67,15 +66,15 @@ def render_lecture_visual(topic, params=None):
         ax.plot(px, py, 'ro')
         an_val = (v**2/rho)
         ax.quiver(px, py, -np.cos(np.pi/4)*an_val*2, -np.sin(np.pi/4)*an_val*2, color='red', scale=50, label='an = v²/ρ')
-        ax.set_title(f"Normal Acceleration: {an_val:.2f} m/s²")
+        ax.set_title(f"Normal Accel Derivation: an = {an_val:.2f} m/s²")
 
     elif topic == "Polar Coordinates":
         r_val, theta_deg = params.get('r', 20), params.get('theta', 45)
         theta_rad = np.radians(theta_deg)
         ax.quiver(0, 0, np.cos(theta_rad)*r_val, np.sin(theta_rad)*r_val, color='black', scale=20)
-        ax.set_title("Polar: Radial Vector r")
+        ax.set_title("Polar Coordinate: Radial Vector Components")
 
-    ax.legend(); ax.grid(True, alpha=0.3)
+    ax.grid(True, alpha=0.3)
     buf = io.BytesIO()
     fig.savefig(buf, format='png')
     plt.close(fig)
