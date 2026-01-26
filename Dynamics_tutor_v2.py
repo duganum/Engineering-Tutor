@@ -76,11 +76,10 @@ if st.session_state.page == "landing":
                     st.session_state.current_prob = prob
                     st.session_state.page = "chat"; st.rerun()
 
-# --- Page 2: Socratic Chat Interface (Practice Problems) ---
+# --- Page 2: Chat ---
 elif st.session_state.page == "chat":
     prob = st.session_state.current_prob
     p_id = prob['id']
-
     if p_id not in st.session_state.grading_data:
         st.session_state.grading_data[p_id] = {'solved': set()}
     solved = st.session_state.grading_data[p_id]['solved']
@@ -94,9 +93,8 @@ elif st.session_state.page == "chat":
     with cols[1]:
         st.metric("Variables Found", f"{len(solved)} / {len(prob['targets'])}")
         st.progress(len(solved) / len(prob['targets']) if len(prob['targets']) > 0 else 0)
-        st.markdown("---")
         st.write("### End Session")
-        feedback = st.text_area("Optional Feedback:", placeholder="What was difficult?")
+        feedback = st.text_area("Feedback:", placeholder="What was difficult?")
         
         if st.button("⬅️ Submit Session"):
             history_text = ""
@@ -104,84 +102,79 @@ elif st.session_state.page == "chat":
                 for msg in st.session_state.chat_sessions[p_id].history:
                     role = "Tutor" if msg.role == "model" else "Student"
                     history_text += f"{role}: {msg.parts[0].text}\n"
-            
             with st.spinner("Analyzing..."):
                 report = analyze_and_send_report(st.session_state.user_name, prob['category'], history_text + feedback)
                 st.session_state.last_report = report
                 st.session_state.page = "report_view"; st.rerun()
 
     if p_id not in st.session_state.chat_sessions:
-        sys_prompt = f"You are a Socratic Tutor for {st.session_state.user_name}. Problem: {prob['statement']}. Guide them using English only."
+        sys_prompt = f"You are a Socratic Tutor for {st.session_state.user_name}. Problem: {prob['statement']}. Guide them using English."
         model = get_gemini_model(sys_prompt)
-        if model:
-            session = model.start_chat(history=[])
-            session.send_message("Let's start. How should we approach the kinematics of this problem?")
-            st.session_state.chat_sessions[p_id] = session
+        st.session_state.chat_sessions[p_id] = model.start_chat(history=[])
+        st.session_state.chat_sessions[p_id].send_message("Let's start. What is our first step?")
 
     for message in st.session_state.chat_sessions[p_id].history:
         with st.chat_message("assistant" if message.role == "model" else "user"):
             st.markdown(re.sub(r'\(Internal Status:.*?\)', '', message.parts[0].text).strip())
 
-    if user_input := st.chat_input("Type your English response here..."):
+    if user_input := st.chat_input("Response..."):
         for target, val in prob['targets'].items():
             if target not in solved and check_numeric_match(user_input, val):
                 st.session_state.grading_data[p_id]['solved'].add(target)
-        st.session_state.chat_sessions[p_id].send_message(user_input)
-        st.rerun()
+        st.session_state.chat_sessions[p_id].send_message(user_input); st.rerun()
 
-# --- Page 3: Interactive Lecture Agent (The Lab) ---
+# --- Page 3: Interactive Lecture Agent ---
 elif st.session_state.page == "lecture":
     topic = st.session_state.lecture_topic
     st.title(f"🎓 Physics Lab: {topic} Dynamics")
-    
     col_sim, col_chat = st.columns([1, 1])
     
     with col_sim:
         st.subheader("🛠️ Parameters & Vector Analysis")
         params = {}
-        
         if topic == "Projectile Motion":
             params['v0'] = st.slider("Initial Speed (v0)", 5, 100, 30)
             params['angle'] = st.slider("Launch Angle (theta)", 0, 90, 45)
             st.latex(r"v_x = v_0 \cos \theta, \quad v_y = v_0 \sin \theta - gt")
-            [Image of projectile motion showing the horizontal and vertical velocity components]
+            # Image tags must be inside comments or deleted
+            # 
             
         elif topic == "Normal & Tangent":
             params['v'] = st.slider("Constant Speed (v)", 1, 50, 20)
             params['rho'] = st.slider("Radius of Curvature (rho)", 5, 100, 50)
             st.latex(r"a_n = \frac{v^2}{\rho}, \quad a_t = \dot{v}")
-            [Image of normal and tangential acceleration components in curvilinear motion]
+            # 
             
         elif topic == "Polar Coordinates":
             params['r'] = st.slider("Radial Distance (r)", 1, 50, 20)
             params['theta'] = st.slider("Angle (theta)", 0, 360, 45)
             st.latex(r"v = \dot{r} e_r + r \dot{\theta} e_\theta")
-            [Image of polar coordinate system with radial r and unit vectors er and etheta]
+            # 
 
         st.image(render_lecture_visual(topic, params))
-        
         if st.button("🏠 Exit to Main Menu"):
-            st.session_state.lecture_session = None
-            st.session_state.page = "landing"; st.rerun()
+            st.session_state.lecture_session = None; st.session_state.page = "landing"; st.rerun()
 
     with col_chat:
         st.subheader("💬 Socratic Tutor: English Lecture")
         if "lecture_session" not in st.session_state or st.session_state.lecture_session is None:
             sys_msg = (
                 f"You are a Physics Professor at TAMUCC. Topic: {topic}. "
-                "STRICT INSTRUCTION: Respond only in English. Explain derivations "
-                "interactively using the simulation. Help students understand formulas like "
-                "an = v^2/rho by asking guiding questions about the sliders."
+                "STRICT INSTRUCTION: Respond only in English. Help students understand "
+                "formulas like an = v^2/rho by asking guiding questions about the sliders."
             )
             model = get_gemini_model(sys_msg)
             st.session_state.lecture_session = model.start_chat(history=[])
-            st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}! Let's derive the {topic} equations together. Look at the sliders. If you increase the speed, how will the normal acceleration change?")
+            st.session_state.lecture_session.send_message(
+                f"Hello {st.session_state.user_name}! Let's derive the {topic} equations. "
+                "Look at the sliders. If you increase the speed, how will the normal acceleration change?"
+            )
 
         for msg in st.session_state.lecture_session.history:
             with st.chat_message("assistant" if msg.role == "model" else "user"):
                 st.write(msg.parts[0].text)
 
-        if lecture_input := st.chat_input("Ask about the derivation..."):
+        if lecture_input := st.chat_input("Ask a question..."):
             st.session_state.lecture_session.send_message(lecture_input); st.rerun()
 
 # --- Page 4: Report View ---
