@@ -4,22 +4,87 @@ import os
 import io
 
 def render_problem_diagram(prob_id):
-    """Generates diagrams or loads images for practice problems."""
+    """Generates precise FBDs and geometric diagrams for all Statics categories."""
     pid = str(prob_id).strip()
-    fig, ax = plt.subplots(figsize=(4, 3), dpi=200)
+    fig, ax = plt.subplots(figsize=(4, 3), dpi=100)
     ax.set_aspect('equal')
     found = False
 
-    # 1. Statics Logic (Manual drawing)
-    if pid.startswith("S_1"):
-        if pid == "S_1.1_1":
-            ax.plot(0, 0, 'ks', markersize=15)
-            ax.annotate('', xy=(-1.5, 0), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', lw=2, color='blue'))
-            ax.annotate('', xy=(1.2, 1.2), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', lw=2, color='green'))
-            ax.annotate('', xy=(0, -1.5), xytext=(0, 0), arrowprops=dict(arrowstyle='->', lw=2, color='red'))
+    # --- S_1.1: Free Body Diagrams (Equilibrium) ---
+    if pid.startswith("S_1.1"):
+        if pid == "S_1.1_1": # 50kg mass cables
+            ax.plot(0, 0, 'ko', markersize=8)
+            ax.annotate('', xy=(-1.5, 0), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', color='blue'))
+            ax.annotate('', xy=(1.2, 1.2), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', color='green'))
+            ax.annotate('', xy=(0, -1.5), xytext=(0, 0), arrowprops=dict(arrowstyle='->', color='red'))
+            ax.text(-1.4, 0.2, 'A', color='blue'); ax.text(1.0, 1.3, 'B (45°)', color='green')
+            found = True
+        elif pid == "S_1.1_2": # Cylinder on Incline
+            theta = np.radians(30)
+            ax.plot([-2, 2], [2*np.tan(-theta), -2*np.tan(-theta)], 'k-', lw=2) # Incline
+            ax.add_patch(plt.Circle((0, 0.5), 0.5, color='gray', alpha=0.5)) # Cylinder
+            ax.annotate('', xy=(0.5*np.sin(theta), 0.5+0.5*np.cos(theta)), xytext=(0, 0.5), 
+                        arrowprops=dict(arrowstyle='->', color='red')) # Normal Force
+            found = True
+        elif pid == "S_1.1_3": # Beam with Pin and Cable
+            ax.plot([0, 3], [0, 0], 'brown', lw=6) # Beam
+            ax.plot(0, 0, 'k^', markersize=10) # Pin A
+            ax.annotate('', xy=(3, 2), xytext=(3, 0), arrowprops=dict(arrowstyle='-', ls='--')) # Cable B
             found = True
 
-    # 2. Kinematics Logic (Image Loading from local folder)
+    # --- S_1.2: Truss Analysis ---
+    elif pid.startswith("S_1.2"):
+        if pid == "S_1.2_1": # Simple Bridge Truss
+            pts = np.array([[0,0], [2,2], [4,0], [0,0]])
+            ax.plot(pts[:,0], pts[:,1], 'k-o')
+            ax.annotate('', xy=(2,-1), xytext=(2,2), arrowprops=dict(arrowstyle='->', color='red')) # Load
+            found = True
+        elif pid == "S_1.2_2": # Triangle Truss (60 deg)
+            pts = np.array([[0,0], [1, 1.73], [2,0], [0,0]])
+            ax.plot(pts[:,0], pts[:,1], 'k-o')
+            ax.set_title("Equilateral Truss (60°)")
+            found = True
+        elif pid == "S_1.2_3": # Pratt Truss
+            ax.plot([0,1,2,3], [0,1,1,0], 'k-o'); ax.plot([0,3], [0,0], 'k-o') # Bottom/Top chords
+            ax.plot([1,1], [0,1], 'k-o'); ax.plot([2,2], [0,1], 'k-o') # Verticals
+            found = True
+
+    # --- S_1.3: Geometric Properties (Centroids/Inertia) ---
+    elif pid.startswith("S_1.3"):
+        if pid == "S_1.3_1": # Rectangle Centroid
+            ax.add_patch(plt.Rectangle((0,0), 4, 6, fill=False, hatch='/'))
+            ax.plot(2, 3, 'rx', markersize=10) # Centroid
+            ax.set_xlim(-1, 5); ax.set_ylim(-1, 7)
+            found = True
+        elif pid == "S_1.3_2": # Square Inertia
+            ax.add_patch(plt.Rectangle((-0.1, -0.1), 0.2, 0.2, color='orange', alpha=0.3))
+            ax.axhline(0, color='black', lw=1); ax.axvline(0, color='black', lw=1)
+            found = True
+        elif pid == "S_1.3_3": # Circle Area
+            ax.add_patch(plt.Circle((0,0), 0.25, color='blue', alpha=0.2))
+            ax.plot([-0.25, 0.25], [0,0], 'k<->') # Diameter line
+            found = True
+
+    # --- S_1.4: Equilibrium (Moments/Levers) ---
+    elif pid.startswith("S_1.4"):
+        if pid == "S_1.4_1": # Pivot/Balance
+            ax.plot([-2, 4], [0, 0], 'k', lw=4) # Bar
+            ax.plot(0, -0.2, 'k^', markersize=15) # Pivot
+            ax.annotate('', xy=(-2, -1), xytext=(-2, 0), arrowprops=dict(arrowstyle='->', color='red'))
+            ax.annotate('', xy=(4, -0.5), xytext=(4, 0), arrowprops=dict(arrowstyle='->', color='blue'))
+            found = True
+        elif pid == "S_1.4_2": # Cantilever Beam
+            ax.plot([0, 3], [0, 0], 'gray', lw=8) # Beam
+            ax.axvline(0, color='black', lw=10) # Fixed Support
+            ax.annotate('', xy=(3, -1), xytext=(3, 0), arrowprops=dict(arrowstyle='->', color='red'))
+            found = True
+        elif pid == "S_1.4_3": # Carrying a log
+            ax.plot([0, 6], [0, 0], 'brown', lw=10) # Log
+            ax.annotate('A', xy=(0, 1), xytext=(0, 0), arrowprops=dict(arrowstyle='<-'))
+            ax.annotate('B', xy=(4, 1), xytext=(4, 0), arrowprops=dict(arrowstyle='<-'))
+            found = True
+
+    # --- Kinematics Image Loader ---
     elif pid.startswith("K"):
         try:
             clean_name = pid.replace("_", "").replace(".", "").lower()
@@ -33,50 +98,13 @@ def render_problem_diagram(prob_id):
         except: pass
 
     if not found:
-        ax.text(0.5, 0.5, f"Diagram\n{pid}", color='red', ha='center')
-        ax.set_xlim(-2.5, 2.5); ax.set_ylim(-2.5, 2.5)
+        ax.text(0.5, 0.5, f"Diagram\n{pid}", color='gray', ha='center')
+        ax.set_xlim(0, 1); ax.set_ylim(0, 1)
 
     ax.axis('off')
     plt.tight_layout()
     buf = io.BytesIO()
     fig.savefig(buf, format='png', bbox_inches='tight')
-    plt.close(fig)
-    buf.seek(0)
-    return buf
-
-def render_lecture_visual(topic, params=None):
-    """Visualizes derivation components for interactive English lectures."""
-    fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
-    
-    if topic == "Projectile Motion":
-        v0, angle = params.get('v0', 30), params.get('angle', 45)
-        g, theta = 9.81, np.radians(angle)
-        t_flight = 2 * v0 * np.sin(theta) / g
-        t = np.linspace(0, t_flight, 100)
-        x = v0 * np.cos(theta) * t
-        y = v0 * np.sin(theta) * t - 0.5 * g * t**2
-        ax.plot(x, y, 'g-', lw=2)
-        ax.set_title(f"Projectile Path Analysis (v0={v0}, angle={angle})")
-
-    elif topic == "Normal & Tangent":
-        v, rho = params.get('v', 20), params.get('rho', 50)
-        s = np.linspace(0, np.pi/2, 100)
-        ax.plot(rho*np.cos(s), rho*np.sin(s), 'k--', lw=1)
-        px, py = rho*np.cos(np.pi/4), rho*np.sin(np.pi/4)
-        ax.plot(px, py, 'ro')
-        an_val = (v**2/rho)
-        ax.quiver(px, py, -np.cos(np.pi/4)*an_val*2, -np.sin(np.pi/4)*an_val*2, color='red', scale=50, label='an = v²/ρ')
-        ax.set_title(f"Normal Accel Derivation: an = {an_val:.2f} m/s²")
-
-    elif topic == "Polar Coordinates":
-        r_val, theta_deg = params.get('r', 20), params.get('theta', 45)
-        theta_rad = np.radians(theta_deg)
-        ax.quiver(0, 0, np.cos(theta_rad)*r_val, np.sin(theta_rad)*r_val, color='black', scale=20)
-        ax.set_title("Polar Coordinate: Radial Vector Components")
-
-    ax.grid(True, alpha=0.3)
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
     plt.close(fig)
     buf.seek(0)
     return buf
