@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 from logic_v2_GitHub import get_gemini_model, load_problems, check_numeric_match, analyze_and_send_report
 from render_v2_GitHub import render_problem_diagram, render_lecture_visual
 
-# 1. Page Configuration & CSS
+# 1. Page Configuration
 st.set_page_config(page_title="Socratic Engineering Tutor", layout="wide")
 
+# 2. CSS: Minimal Button Height (60px) and UI consistency
 st.markdown("""
     <style>
     div.stButton > button {
@@ -26,7 +27,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 2. Initialize Session State
+# 3. Initialize Session State
 if "page" not in st.session_state: st.session_state.page = "landing"
 if "chat_sessions" not in st.session_state: st.session_state.chat_sessions = {}
 if "grading_data" not in st.session_state: st.session_state.grading_data = {}
@@ -45,14 +46,16 @@ if st.session_state.user_name is None:
             if name_input.strip():
                 st.session_state.user_name = name_input.strip()
                 st.rerun()
-            else: st.warning("Identification is required.")
+            else:
+                st.warning("Identification is required for academic reporting.")
     st.stop()
 
-# --- Page 1: Main Menu ---
+# --- Page 1: Main Menu (3-Column Layout with Statics) ---
 if st.session_state.page == "landing":
     st.title(f"🚀 Welcome, {st.session_state.user_name}!")
     st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
     
+    # Section A: Interactive Lectures
     st.markdown("---")
     st.subheader("💡 Interactive Learning Agents")
     col_l1, col_l2, col_l3 = st.columns(3)
@@ -61,7 +64,8 @@ if st.session_state.page == "landing":
         with [col_l1, col_l2, col_l3][i]:
             if st.button(f"🎓 Lecture: {name}", key=f"lec_{pref}", use_container_width=True):
                 st.session_state.lecture_topic = name; st.session_state.page = "lecture"; st.rerun()
-            
+
+    # Section B: Practice Problems
     st.markdown("---")
     st.subheader("📝 Practice Problems")
     categories = {}
@@ -83,7 +87,7 @@ if st.session_state.page == "landing":
                             st.session_state.current_prob = prob; st.session_state.page = "chat"; st.rerun()
     st.markdown("---")
 
-# --- Page 2: Socratic Chat (The Corrected Session Start) ---
+# --- Page 2: Socratic Chat (Wait-for-Student Mode) ---
 elif st.session_state.page == "chat":
     prob = st.session_state.current_prob
     p_id = prob['id']
@@ -94,47 +98,42 @@ elif st.session_state.page == "chat":
     with cols[0]:
         st.subheader(f"📌 {prob['category']}")
         st.info(prob['statement'])
-        # The black dot fix is in the render_v2_GitHub.py file (logic for 'not found')
-        st.image(render_problem_diagram(p_id), width=350)
+        st.image(render_problem_diagram(p_id), width=400)
     
     with cols[1]:
         st.metric("Variables Found", f"{len(solved)} / {len(prob['targets'])}")
         st.progress(len(solved) / len(prob['targets']) if len(prob['targets']) > 0 else 0)
-        feedback = st.text_area("Feedback for Dr. Um:", placeholder="Type notes here...")
+        feedback = st.text_area("Notes for Dr. Um:", placeholder="What was the hardest part?")
         if st.button("⬅️ Submit Session"):
-            history_text = ""
-            if p_id in st.session_state.chat_sessions:
-                for msg in st.session_state.chat_sessions[p_id].history:
-                    history_text += f"{msg.role}: {msg.parts[0].text}\n"
-            analyze_and_send_report(st.session_state.user_name, prob['category'], history_text + feedback)
             st.session_state.page = "landing"; st.rerun()
 
     if p_id not in st.session_state.chat_sessions:
-        # STRICT SYSTEM PROMPT TO PREVENT SELF-ANSWERING
         sys_prompt = (
-            f"You are the Engineering Tutor at TAMUCC for {st.session_state.user_name}. "
-            f"Problem Context: {prob['statement']}. "
-            "STRICT INSTRUCTION: 1. You can see the diagram. Never ask 'what diagram is this'. "
-            "2. Start by asking exactly ONE question about the first step (Free Body Diagram). "
-            "3. DO NOT answer your own question. STOP and WAIT for the student to reply. "
-            "4. Respond only in English."
+            f"You are the Engineering Tutor for {st.session_state.user_name} at TAMUCC. "
+            f"Context: {prob['statement']}. "
+            "STRICT RULES: 1. Do NOT answer your own questions. 2. NEVER ask 'what diagram is this'. "
+            "3. Respond ONLY after the student types something. 4. Use English only. "
+            "5. If the chat is empty, wait for the student to start. No long intros."
         )
         model = get_gemini_model(sys_prompt)
         st.session_state.chat_sessions[p_id] = model.start_chat(history=[])
-        # The AI sends the first question and then Python stops execution here until the next user input
-        st.session_state.chat_sessions[p_id].send_message("Let's start our analysis. For the object in this problem, what is the first force we should draw on its Free Body Diagram?")
 
+    # Display Chat History
     for message in st.session_state.chat_sessions[p_id].history:
         with st.chat_message("assistant" if message.role == "model" else "user"):
-            st.markdown(re.sub(r'\(Internal Status:.*?\)', '', message.parts[0].text).strip())
+            st.markdown(message.parts[0].text)
 
-    if user_input := st.chat_input("Enter your answer..."):
+    # First interaction prompt
+    if not st.session_state.chat_sessions[p_id].history:
+        st.write("👋 **Tutor Ready.** Please describe the first step of your Free Body Diagram (FBD) to begin.")
+
+    if user_input := st.chat_input("Your analysis..."):
         for target, val in prob['targets'].items():
             if target not in solved and check_numeric_match(user_input, val):
                 st.session_state.grading_data[p_id]['solved'].add(target)
         st.session_state.chat_sessions[p_id].send_message(user_input); st.rerun()
 
-# --- Page 3: Lecture (Same Step-by-Step Logic) ---
+# --- Page 3: Interactive Lecture (Socratic Mode) ---
 elif st.session_state.page == "lecture":
     topic = st.session_state.lecture_topic
     st.title(f"🎓 Lab: {topic}")
@@ -159,5 +158,11 @@ elif st.session_state.page == "lecture":
             st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}. Look at the simulation. How does the vector change if you increase the speed slider?")
         for msg in st.session_state.lecture_session.history:
             with st.chat_message("assistant" if msg.role == "model" else "user"): st.write(msg.parts[0].text)
-        if lecture_input := st.chat_input("Type here..."):
+        if lecture_input := st.chat_input("Answer..."):
             st.session_state.lecture_session.send_message(lecture_input); st.rerun()
+
+# --- Page 4: Report View ---
+elif st.session_state.page == "report_view":
+    st.title("📊 Report View")
+    st.markdown(st.session_state.get("last_report", "No report available."))
+    if st.button("Return"): st.session_state.page = "landing"; st.rerun()
