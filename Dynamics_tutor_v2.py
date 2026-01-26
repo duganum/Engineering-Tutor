@@ -1,82 +1,192 @@
-import matplotlib.pyplot as plt
+import streamlit as st
+import json
+import re
 import numpy as np
-import os
-import io
+import matplotlib.pyplot as plt
+from logic_v2_GitHub import get_gemini_model, load_problems, check_numeric_match, analyze_and_send_report
+from render_v2_GitHub import render_problem_diagram, render_lecture_visual
 
-def render_problem_diagram(prob_id):
-    """Generates diagrams or loads images for practice problems."""
-    pid = str(prob_id).strip()
-    fig, ax = plt.subplots(figsize=(4, 3), dpi=200)
-    ax.set_aspect('equal')
-    found = False
+st.set_page_config(page_title="Socratic Engineering Tutor", layout="wide")
 
-    # 1. Statics Logic (Manual drawing)
-    if pid.startswith("S_1"):
-        if pid == "S_1.1_1":
-            ax.plot(0, 0, 'ks', markersize=15)
-            ax.annotate('', xy=(-1.5, 0), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', lw=2, color='blue'))
-            ax.annotate('', xy=(1.2, 1.2), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', lw=2, color='green'))
-            ax.annotate('', xy=(0, -1.5), xytext=(0, 0), arrowprops=dict(arrowstyle='->', lw=2, color='red'))
-            found = True
+# 1. Initialize Session State
+if "page" not in st.session_state: st.session_state.page = "landing"
+if "chat_sessions" not in st.session_state: st.session_state.chat_sessions = {}
+if "grading_data" not in st.session_state: st.session_state.grading_data = {}
+if "user_name" not in st.session_state: st.session_state.user_name = None
+if "lecture_topic" not in st.session_state: st.session_state.lecture_topic = None
 
-    # 2. Kinematics Logic (Image Loading from local folder)
-    elif pid.startswith("K"):
-        try:
-            clean_name = pid.replace("_", "").replace(".", "").lower()
-            img_path = f'images/{clean_name}.png'
-            if os.path.exists(img_path):
-                img = plt.imread(img_path)
-                ax.imshow(img)
-                h, w = img.shape[:2]
-                ax.set_xlim(0, w); ax.set_ylim(h, 0)
-                found = True
-        except: pass
+PROBLEMS = load_problems()
 
-    if not found:
-        ax.text(0.5, 0.5, f"Diagram\n{pid}", color='red', ha='center')
-        ax.set_xlim(-2.5, 2.5); ax.set_ylim(-2.5, 2.5)
+# --- Page 0: Name Entry ---
+if st.session_state.user_name is None:
+    st.title("🛡️ Engineering Mechanics Portal")
+    st.markdown("### Texas A&M University - Corpus Christi")
+    with st.form("name_form"):
+        name_input = st.text_input("Enter your Full Name to begin")
+        if st.form_submit_button("Access Tutor"):
+            if name_input.strip():
+                st.session_state.user_name = name_input.strip()
+                st.rerun()
+            else:
+                st.warning("Identification is required for academic reporting.")
+    st.stop()
 
-    ax.axis('off')
-    plt.tight_layout()
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png', bbox_inches='tight')
-    plt.close(fig)
-    buf.seek(0)
-    return buf
-
-def render_lecture_visual(topic, params=None):
-    """Visualizes derivation components for interactive English lectures."""
-    fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
+# --- Page 1: Main Menu ---
+if st.session_state.page == "landing":
+    st.title(f"🚀 Welcome, {st.session_state.user_name}!")
+    st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
     
-    if topic == "Projectile Motion":
-        v0, angle = params.get('v0', 30), params.get('angle', 45)
-        g, theta = 9.81, np.radians(angle)
-        t_flight = 2 * v0 * np.sin(theta) / g
-        t = np.linspace(0, t_flight, 100)
-        x = v0 * np.cos(theta) * t
-        y = v0 * np.sin(theta) * t - 0.5 * g * t**2
-        ax.plot(x, y, 'g-', lw=2)
-        ax.set_title(f"Projectile Path Analysis (v0={v0}, angle={angle})")
+    st.markdown("---")
+    st.subheader("💡 Interactive Learning Agents")
+    st.write("Learn the derivation of velocity (v) and acceleration (a) through real-time simulations.")
+    
+    col1, col2, col3, _ = st.columns([1, 1, 1, 1])
+    
+    with col1:
+        if st.button("🎓 Lecture: Projectile Motion", use_container_width=True):
+            st.session_state.lecture_topic = "Projectile Motion"
+            st.session_state.page = "lecture"; st.rerun()
+            
+    with col2:
+        if st.button("🎓 Lecture: Normal & Tangent", use_container_width=True):
+            st.session_state.lecture_topic = "Normal & Tangent"
+            st.session_state.page = "lecture"; st.rerun()
+            
+    with col3:
+        if st.button("🎓 Lecture: Polar Coordinates", use_container_width=True):
+            st.session_state.lecture_topic = "Polar Coordinates"
+            st.session_state.page = "lecture"; st.rerun()
+            
+    st.markdown("---")
+    st.markdown("### 📝 Practice Problems")
+    
+    categories = {}
+    for p in PROBLEMS:
+        cat_main = p.get('category', 'General').split(":")[0].strip()
+        if cat_main not in categories: categories[cat_main] = []
+        categories[cat_main].append(p)
 
-    elif topic == "Normal & Tangent":
-        v, rho = params.get('v', 20), params.get('rho', 50)
-        s = np.linspace(0, np.pi/2, 100)
-        ax.plot(rho*np.cos(s), rho*np.sin(s), 'k--', lw=1)
-        px, py = rho*np.cos(np.pi/4), rho*np.sin(np.pi/4)
-        ax.plot(px, py, 'ro')
-        an_val = (v**2/rho)
-        ax.quiver(px, py, -np.cos(np.pi/4)*an_val*2, -np.sin(np.pi/4)*an_val*2, color='red', scale=50, label='an = v²/ρ')
-        ax.set_title(f"Normal Accel Derivation: an = {an_val:.2f} m/s²")
+    for cat_name, probs in categories.items():
+        st.header(cat_name)
+        cols = st.columns(3)
+        for idx, prob in enumerate(probs):
+            with cols[idx % 3]:
+                sub_label = prob.get('category', '').split(":")[-1].strip()
+                if st.button(f"**{sub_label}**\n\nID: {prob['id']}", key=f"btn_{prob['id']}", use_container_width=True):
+                    st.session_state.current_prob = prob
+                    st.session_state.page = "chat"; st.rerun()
 
-    elif topic == "Polar Coordinates":
-        r_val, theta_deg = params.get('r', 20), params.get('theta', 45)
-        theta_rad = np.radians(theta_deg)
-        ax.quiver(0, 0, np.cos(theta_rad)*r_val, np.sin(theta_rad)*r_val, color='black', scale=20)
-        ax.set_title("Polar Coordinate: Radial Vector Components")
+# --- Page 2: Socratic Chat Interface (Practice Problems) ---
+elif st.session_state.page == "chat":
+    prob = st.session_state.current_prob
+    p_id = prob['id']
 
-    ax.grid(True, alpha=0.3)
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    plt.close(fig)
-    buf.seek(0)
-    return buf
+    if p_id not in st.session_state.grading_data:
+        st.session_state.grading_data[p_id] = {'solved': set()}
+    solved = st.session_state.grading_data[p_id]['solved']
+    
+    cols = st.columns([2, 1])
+    with cols[0]:
+        st.subheader(f"📌 {prob['category']}")
+        st.info(prob['statement'])
+        st.image(render_problem_diagram(p_id), width=350)
+    
+    with cols[1]:
+        st.metric("Variables Found", f"{len(solved)} / {len(prob['targets'])}")
+        st.progress(len(solved) / len(prob['targets']) if len(prob['targets']) > 0 else 0)
+        st.markdown("---")
+        st.write("### End Session")
+        feedback = st.text_area("Optional Feedback:", placeholder="What was difficult?")
+        
+        if st.button("⬅️ Submit Session"):
+            history_text = ""
+            if p_id in st.session_state.chat_sessions:
+                for msg in st.session_state.chat_sessions[p_id].history:
+                    role = "Tutor" if msg.role == "model" else "Student"
+                    history_text += f"{role}: {msg.parts[0].text}\n"
+            
+            with st.spinner("Analyzing..."):
+                report = analyze_and_send_report(st.session_state.user_name, prob['category'], history_text + feedback)
+                st.session_state.last_report = report
+                st.session_state.page = "report_view"; st.rerun()
+
+    if p_id not in st.session_state.chat_sessions:
+        sys_prompt = f"You are a Socratic Tutor for {st.session_state.user_name}. Problem: {prob['statement']}. Guide them using English only."
+        model = get_gemini_model(sys_prompt)
+        if model:
+            session = model.start_chat(history=[])
+            session.send_message("Let's start. How should we approach the kinematics of this problem?")
+            st.session_state.chat_sessions[p_id] = session
+
+    for message in st.session_state.chat_sessions[p_id].history:
+        with st.chat_message("assistant" if message.role == "model" else "user"):
+            st.markdown(re.sub(r'\(Internal Status:.*?\)', '', message.parts[0].text).strip())
+
+    if user_input := st.chat_input("Type your English response here..."):
+        for target, val in prob['targets'].items():
+            if target not in solved and check_numeric_match(user_input, val):
+                st.session_state.grading_data[p_id]['solved'].add(target)
+        st.session_state.chat_sessions[p_id].send_message(user_input)
+        st.rerun()
+
+# --- Page 3: Interactive Lecture Agent (The Lab) ---
+elif st.session_state.page == "lecture":
+    topic = st.session_state.lecture_topic
+    st.title(f"🎓 Physics Lab: {topic} Dynamics")
+    
+    col_sim, col_chat = st.columns([1, 1])
+    
+    with col_sim:
+        st.subheader("🛠️ Parameters & Vector Analysis")
+        params = {}
+        
+        if topic == "Projectile Motion":
+            params['v0'] = st.slider("Initial Speed (v0)", 5, 100, 30)
+            params['angle'] = st.slider("Launch Angle (theta)", 0, 90, 45)
+            st.latex(r"v_x = v_0 \cos \theta, \quad v_y = v_0 \sin \theta - gt")
+            [Image of projectile motion showing the horizontal and vertical velocity components]
+            
+        elif topic == "Normal & Tangent":
+            params['v'] = st.slider("Constant Speed (v)", 1, 50, 20)
+            params['rho'] = st.slider("Radius of Curvature (rho)", 5, 100, 50)
+            st.latex(r"a_n = \frac{v^2}{\rho}, \quad a_t = \dot{v}")
+            [Image of normal and tangential acceleration components in curvilinear motion]
+            
+        elif topic == "Polar Coordinates":
+            params['r'] = st.slider("Radial Distance (r)", 1, 50, 20)
+            params['theta'] = st.slider("Angle (theta)", 0, 360, 45)
+            st.latex(r"v = \dot{r} e_r + r \dot{\theta} e_\theta")
+            [Image of polar coordinate system with radial r and unit vectors er and etheta]
+
+        st.image(render_lecture_visual(topic, params))
+        
+        if st.button("🏠 Exit to Main Menu"):
+            st.session_state.lecture_session = None
+            st.session_state.page = "landing"; st.rerun()
+
+    with col_chat:
+        st.subheader("💬 Socratic Tutor: English Lecture")
+        if "lecture_session" not in st.session_state or st.session_state.lecture_session is None:
+            sys_msg = (
+                f"You are a Physics Professor at TAMUCC. Topic: {topic}. "
+                "STRICT INSTRUCTION: Respond only in English. Explain derivations "
+                "interactively using the simulation. Help students understand formulas like "
+                "an = v^2/rho by asking guiding questions about the sliders."
+            )
+            model = get_gemini_model(sys_msg)
+            st.session_state.lecture_session = model.start_chat(history=[])
+            st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}! Let's derive the {topic} equations together. Look at the sliders. If you increase the speed, how will the normal acceleration change?")
+
+        for msg in st.session_state.lecture_session.history:
+            with st.chat_message("assistant" if msg.role == "model" else "user"):
+                st.write(msg.parts[0].text)
+
+        if lecture_input := st.chat_input("Ask about the derivation..."):
+            st.session_state.lecture_session.send_message(lecture_input); st.rerun()
+
+# --- Page 4: Report View ---
+elif st.session_state.page == "report_view":
+    st.title("📊 Performance Summary")
+    st.markdown(st.session_state.get("last_report", "No report available."))
+    if st.button("Return to Menu"):
+        st.session_state.page = "landing"; st.rerun()
