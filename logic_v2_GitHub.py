@@ -42,20 +42,21 @@ def check_numeric_match(user_val, correct_val, tolerance=0.05):
 
 def evaluate_understanding_score(chat_history):
     """
-    강의 세션의 대화 내용을 바탕으로 이해도를 0-10점으로 평가합니다.
-    수식 사용 여부에 따라 점수 상한선을 둡니다.
+    강의 세션 대화 내용을 바탕으로 이해도를 0-10점으로 평가합니다.
+    수식 사용 및 LaTeX 포맷 준수 여부에 따라 엄격하게 채점합니다.
     """
     eval_instruction = (
         "You are a strict Engineering Professor at Texas A&M University - Corpus Christi. "
-        "Evaluate the student's level of understanding from 0 to 10 based ONLY on the chat history.\n\n"
+        "Evaluate the student's level of understanding (0-10) based ONLY on the chat history.\n\n"
         "STRICT SCORING RUBRIC:\n"
-        "0-3: Little to no participation or irrelevant answers.\n"
-        "4-5: Good conversational engagement but NO use of governing equations or technical formulas.\n"
-        "6-8: Shows conceptual understanding and correctly identifies/uses the relevant equations.\n"
-        "9-10: Complete mastery, correct use of equations, and clear explanation of the physics logic.\n\n"
-        "CRITICAL RULE: If the student has not correctly mentioned or applied the RELEVANT EQUATIONS "
-        "for the topic, you MUST NOT give a score higher than 5, regardless of how well they talk. "
-        "Output ONLY the integer."
+        "0-3: Little participation, irrelevant answers, or purely non-technical chat.\n"
+        "4-5: Good engagement and conceptual talk, but lacks governing equations or proper LaTeX notation.\n"
+        "6-8: Demonstrates understanding by correctly identifying and using relevant equations in LaTeX (e.g., $a_x = 0$, $a_y = -g$).\n"
+        "9-10: Complete mastery. Correctly applies complex kinematic/dynamic equations and explains the physics logic flawlessly.\n\n"
+        "CRITICAL RULES:\n"
+        "1. If the student does not provide or correctly explain the specific GOVERNING EQUATIONS, do NOT exceed 5.\n"
+        "2. If the student uses sloppy notation (like 'ax' or 'a_x') instead of LaTeX ($a_x$), penalize the score.\n"
+        "3. Output ONLY the integer."
     )
     
     model = get_gemini_model(eval_instruction)
@@ -63,19 +64,19 @@ def evaluate_understanding_score(chat_history):
 
     try:
         response = model.generate_content(f"Chat history to evaluate:\n{chat_history}")
-        # 숫자만 추출
+        # Extract number
         score_match = re.search(r"\d+", response.text)
         if score_match:
             score = int(score_match.group())
-            return min(max(score, 0), 10) # 0-10 사이 유지
+            return min(max(score, 0), 10)
         return 0
     except Exception:
         return 0
 
 def analyze_and_send_report(user_name, topic_title, chat_history):
-    """문제 풀이 또는 강의 세션을 분석하여 Dr. Um에게 이메일 리포트를 전송합니다."""
+    """세션을 분석하여 Dr. Um에게 이메일 리포트를 전송합니다. LaTeX 가독성을 확인합니다."""
     
-    # 이메일 전송 전 점수 산출
+    # Calculate score before sending report
     score = evaluate_understanding_score(chat_history)
     
     report_instruction = (
@@ -83,8 +84,8 @@ def analyze_and_send_report(user_name, topic_title, chat_history):
         "Your report must include:\n"
         "1. Session Overview\n"
         f"2. Numerical Understanding Score: {score}/10\n"
-        "3. Technical Accuracy: Did they use the correct equations?\n"
-        "4. Concept Mastery: Strengths and gaps.\n"
+        "3. Mathematical Rigor: Did the student use proper LaTeX and governing equations?\n"
+        "4. Concept Mastery: Strengths and gaps in understanding.\n"
         "5. Engagement Level\n"
         "6. CRITICAL: Quote the section '--- STUDENT FEEDBACK ---' exactly."
     )
@@ -97,7 +98,7 @@ def analyze_and_send_report(user_name, topic_title, chat_history):
         f"Topic: {topic_title}\n"
         f"Assigned Score: {score}/10\n\n"
         f"DATA:\n{chat_history}\n\n"
-        "Please format the report professionally for Dr. Dugan Um."
+        "Format the report professionally for Dr. Dugan Um. Ensure all math in the report uses LaTeX."
     )
     
     try:
@@ -106,7 +107,7 @@ def analyze_and_send_report(user_name, topic_title, chat_history):
     except Exception as e:
         report_text = f"Analysis failed: {str(e)}"
 
-    # Email configuration
+    # Email Logic
     sender = st.secrets["EMAIL_SENDER"]
     password = st.secrets["EMAIL_PASSWORD"] 
     receiver = "dugan.um@gmail.com" 
