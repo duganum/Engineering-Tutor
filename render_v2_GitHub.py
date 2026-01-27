@@ -4,7 +4,7 @@ import os
 import io
 
 def render_problem_diagram(prob_id):
-    """Generates precise FBDs and geometric diagrams for all Statics categories."""
+    """Generates precise FBDs and geometric diagrams for all Statics and Kinematics categories."""
     pid = str(prob_id).strip()
     fig, ax = plt.subplots(figsize=(4, 3), dpi=100)
     ax.set_aspect('equal')
@@ -17,7 +17,7 @@ def render_problem_diagram(prob_id):
             ax.annotate('', xy=(-1.5, 0), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', color='blue'))
             ax.annotate('', xy=(1.2, 1.2), xytext=(0, 0), arrowprops=dict(arrowstyle='<-', color='green'))
             ax.annotate('', xy=(0, -1.5), xytext=(0, 0), arrowprops=dict(arrowstyle='->', color='red'))
-            ax.text(-1.4, 0.2, 'A', color='blue'); ax.text(1.0, 1.3, 'B (45°)', color='green')
+            ax.text(-1.4, 0.2, '$T_A$', color='blue'); ax.text(1.0, 1.3, '$T_B (45^\circ)$', color='green')
             ax.set_xlim(-2, 2); ax.set_ylim(-2, 2)
             found = True
         elif pid == "S_1.1_2": # Cylinder on Incline
@@ -103,12 +103,12 @@ def render_problem_diagram(prob_id):
                 img = plt.imread(img_path)
                 ax.imshow(img)
                 h, w = img.shape[:2]
-                ax.set_xlim(0, w); ax.set_ylim(h, 0)
+                ax.set_xlim(0, w); ax.set_ylim(h, 0) # Keeps image orientation standard
                 found = True
         except: pass
 
     if not found:
-        ax.text(0.5, 0.5, f"Diagram\n{pid}", color='gray', ha='center', va='center')
+        ax.text(0.5, 0.5, f"Diagram\n{pid}\n(Missing)", color='gray', ha='center', va='center')
         ax.set_xlim(0, 1); ax.set_ylim(0, 1)
 
     ax.axis('off')
@@ -120,9 +120,15 @@ def render_problem_diagram(prob_id):
     return buf
 
 def render_lecture_visual(topic, params=None):
-    """Visualizes derivation components for interactive engineering lectures."""
-    fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
+    """Visualizes derivation components with a centered origin (0,0)."""
+    fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
     if params is None: params = {}
+    
+    # Force the origin (0,0) to be the center
+    ax.axhline(0, color='black', lw=1.5, alpha=0.7)
+    ax.axvline(0, color='black', lw=1.5, alpha=0.7)
+    ax.grid(True, linestyle=':', alpha=0.5)
+    ax.set_aspect('equal')
     
     if topic == "Projectile Motion":
         v0, angle = params.get('v0', 30), params.get('angle', 45)
@@ -131,39 +137,57 @@ def render_lecture_visual(topic, params=None):
         t = np.linspace(0, t_flight, 100)
         x = v0 * np.cos(theta) * t
         y = v0 * np.sin(theta) * t - 0.5 * g * t**2
-        ax.plot(x, y, 'g-', lw=2)
-        ax.set_title(f"Projectile Path Analysis ($v_0$={v0}, angle={angle})")
+        ax.plot(x, y, 'g-', lw=2, label='Trajectory')
+        ax.set_xlim(-5, max(x)+5); ax.set_ylim(-5, max(y)+5)
+        ax.set_title(r"Projectile Motion: $y = x\tan\theta - \frac{gx^2}{2v_0^2\cos^2\theta}$")
 
     elif topic == "Normal & Tangent":
         v, rho = params.get('v', 20), params.get('rho', 50)
+        # Draw the curve path
         s = np.linspace(0, np.pi/2, 100)
         ax.plot(rho*np.cos(s), rho*np.sin(s), 'k--', lw=1)
+        # Position of particle at 45 deg
         px, py = rho*np.cos(np.pi/4), rho*np.sin(np.pi/4)
         ax.plot(px, py, 'ro')
-        an_val = (v**2/rho)
-        ax.quiver(px, py, -np.cos(np.pi/4)*an_val*2, -np.sin(np.pi/4)*an_val*2, color='red', scale=50, label='$a_n = v^2/\\rho$')
-        ax.set_title(f"Normal Accel Derivation: $a_n$ = {an_val:.2f} $m/s^2$")
+        an_mag = (v**2/rho)
+        # Draw Normal Acceleration vector pointing to center (origin)
+        ax.quiver(px, py, -px, -py, color='red', angles='xy', scale_units='xy', scale=1.5, label=r'$\vec{a}_n$')
+        ax.set_title(r"Path Coordinates: $a_n = \frac{v^2}{\rho}$")
+        ax.set_xlim(-10, rho+10); ax.set_ylim(-10, rho+10)
 
     elif topic == "Polar Coordinates":
-        r_val, theta_deg = params.get('r', 20), params.get('theta', 45)
+        r, theta_deg = params.get('r', 20), params.get('theta', 45)
         theta_rad = np.radians(theta_deg)
-        ax.quiver(0, 0, np.cos(theta_rad)*r_val, np.sin(theta_rad)*r_val, color='black', scale=20)
-        ax.set_title("Polar Coordinate: Radial Vector Components")
+        vx, vy = np.cos(theta_rad)*r, np.sin(theta_rad)*r
+        ax.quiver(0, 0, vx, vy, color='blue', angles='xy', scale_units='xy', scale=1, label=r'$\vec{r}$')
+        ax.set_title(r"Polar Vector: $\vec{r} = r\vec{u}_r$")
+        limit = r + 5
+        ax.set_xlim(-limit, limit); ax.set_ylim(-limit, limit)
 
     elif topic == "Relative Motion":
-        # Visualizing v_A = v_B + v_A/B
         vA = params.get('vA', [15, 5])
         vB = params.get('vB', [10, -5])
-        ax.quiver(0, 0, vA[0], vA[1], color='blue', scale=40, label='$\\vec{v}_A$')
-        ax.quiver(0, 0, vB[0], vB[1], color='red', scale=40, label='$\\vec{v}_B$')
-        # Relative vector v_A/B starting from tip of v_B to tip of v_A
-        ax.quiver(vB[0], vB[1], vA[0]-vB[0], vA[1]-vB[1], color='green', scale=40, label='$\\vec{v}_{A/B}$')
-        ax.set_title("Relative Velocity: $\\vec{v}_A = \\vec{v}_B + \\vec{v}_{A/B}$")
-        ax.legend()
+        
+        # Calculate Relative Vector
+        v_rel_x = vA[0] - vB[0]
+        v_rel_y = vA[1] - vB[1]
 
-    ax.grid(True, alpha=0.3)
+        # Draw vA and vB from centered origin
+        ax.quiver(0, 0, vA[0], vA[1], color='blue', angles='xy', scale_units='xy', scale=1, label=r'$\vec{v}_A$')
+        ax.quiver(0, 0, vB[0], vB[1], color='red', angles='xy', scale_units='xy', scale=1, label=r'$\vec{v}_B$')
+        
+        # Draw vA/B starting at the tip of vB ending at tip of vA
+        ax.quiver(vB[0], vB[1], v_rel_x, v_rel_y, color='green', angles='xy', scale_units='xy', scale=1, label=r'$\vec{v}_{A/B}$')
+        
+        ax.set_title(r"Relative Motion: $\vec{v}_A = \vec{v}_B + \vec{v}_{A/B}$")
+        ax.legend(loc='upper right')
+        
+        # Symmetrize limits to keep (0,0) in the middle
+        max_v = max(np.abs([vA[0], vA[1], vB[0], vB[1]])) + 10
+        ax.set_xlim(-max_v, max_v); ax.set_ylim(-max_v, max_v)
+
     buf = io.BytesIO()
-    fig.savefig(buf, format='png')
+    fig.savefig(buf, format='png', bbox_inches='tight')
     plt.close(fig)
     buf.seek(0)
     return buf
