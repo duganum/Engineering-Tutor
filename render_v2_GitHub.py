@@ -120,8 +120,9 @@ def render_problem_diagram(prob_id):
     return buf
 
 def render_lecture_visual(topic, params=None):
-    """Visualizes derivation components for interactive English lectures."""
+    """Visualizes derivation components for interactive engineering lectures."""
     fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
+    if params is None: params = {}
     
     if topic == "Projectile Motion":
         v0, angle = params.get('v0', 30), params.get('angle', 45)
@@ -148,6 +149,17 @@ def render_lecture_visual(topic, params=None):
         theta_rad = np.radians(theta_deg)
         ax.quiver(0, 0, np.cos(theta_rad)*r_val, np.sin(theta_rad)*r_val, color='black', scale=20)
         ax.set_title("Polar Coordinate: Radial Vector Components")
+
+    elif topic == "Relative Motion":
+        # Visualizing v_A = v_B + v_A/B
+        vA = params.get('vA', [15, 5])
+        vB = params.get('vB', [10, -5])
+        ax.quiver(0, 0, vA[0], vA[1], color='blue', scale=40, label='$\\vec{v}_A$')
+        ax.quiver(0, 0, vB[0], vB[1], color='red', scale=40, label='$\\vec{v}_B$')
+        # Relative vector v_A/B starting from tip of v_B to tip of v_A
+        ax.quiver(vB[0], vB[1], vA[0]-vB[0], vA[1]-vB[1], color='green', scale=40, label='$\\vec{v}_{A/B}$')
+        ax.set_title("Relative Velocity: $\\vec{v}_A = \\vec{v}_B + \\vec{v}_{A/B}$")
+        ax.legend()
 
     ax.grid(True, alpha=0.3)
     buf = io.BytesIO()
