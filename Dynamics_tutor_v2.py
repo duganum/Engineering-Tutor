@@ -78,6 +78,11 @@ if st.session_state.page == "landing":
     categories = {}
     for p in PROBLEMS:
         cat_main = p.get('category', 'General').split(":")[0].strip()
+        
+        # Mapping Kinematics to Particle Kinematics for display
+        if cat_main == "Kinematics":
+            cat_main = "Particle Kinematics"
+            
         if cat_main not in categories: categories[cat_main] = []
         categories[cat_main].append(p)
 
