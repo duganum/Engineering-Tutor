@@ -156,15 +156,16 @@
   {
     "id": "K_2.5_2",
     "category": "Kinematics: Relative Motion",
-    "statement": "Rain is falling vertically at a constant speed of $v_r = 10$ m/s. A car travels along a straight road at speed $v_c$. If the rain appears to hit the windshield at an angle of 30 degrees from the vertical, find the speed of the car $v_c$.",
-    "targets": { "v_c": 5.77 },
-    "required_units": ["m/s"]
+    "statement": "A small ship capable of making a speed of 6 knots through still water maintains a heading due east while being set to the south by an ocean current. The actual course of the boat is from A to B, a distance of 10 nautical miles that requires exactly 2 hours. Determine the speed $v_C$ of the current and its direction measured clockwise from the north.",
+    "targets": { "v_C": 4.0, "direction": 143.1 },
+    "required_units": ["knots", "deg"]
   },
   {
     "id": "K_2.5_3",
     "category": "Kinematics: Relative Motion",
-    "statement": "A ship maintains a heading due east at 6 knots through a current flowing south. If the actual course results in a 10 nautical mile displacement over 2 hours, calculate the speed of the current $v_{curr}$.",
-    "targets": { "v_curr": 4.0 },
-    "required_units": ["knots"]
-  }
+    "statement": "Starting from the relative position shown, aircraft B is to rendezvous with the refueling tanker A. If B is to arrive in close proximity to A in a two-minute time interval, what absolute velocity vector should B acquire and maintain? The velocity of the tanker A is 300 mi/hr along the constant-altitude path shown.",
+    "targets": { "v_Bx": 450, "v_By": 86.6 },
+    "required_units": ["mi/hr"]
+  }  
+ 
 ]
