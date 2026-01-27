@@ -145,5 +145,26 @@
     "statement": "The rocket is fired vertically and tracked by the radar station shown. When $\\theta$ reaches $60^\\circ$, other corresponding measurements give the values $r = 30,000$ ft, $\\ddot{r} = 70$ ft/sec$^2$, and $\\dot{\\theta} = 0.02$ rad/sec. Calculate the magnitudes of the velocity and acceleration of the rocket at this position.",
     "targets": { "v": 1200, "a": 84.4 },
     "required_units": ["ft/sec", "ft/sec^2"]
+  },
+  {
+    "id": "K_2.5_1",
+    "category": "Kinematics: Relative Motion",
+    "statement": "Car $A$ rounds a curve of 150-m radius at 54 km/h. Car $B$ is moving at 81 km/h but is slowing down at 3 m/s$^2$. Determine the magnitude of the velocity of $A$ relative to $B$ ($v_{A/B}$) at the instant when the paths are parallel.",
+    "targets": { "v_rel": 7.5 },
+    "required_units": ["m/s"]
+  },
+  {
+    "id": "K_2.5_2",
+    "category": "Kinematics: Relative Motion",
+    "statement": "Rain is falling vertically at a constant speed of $v_r = 10$ m/s. A car travels along a straight road at speed $v_c$. If the rain appears to hit the windshield at an angle of 30 degrees from the vertical, find the speed of the car $v_c$.",
+    "targets": { "v_c": 5.77 },
+    "required_units": ["m/s"]
+  },
+  {
+    "id": "K_2.5_3",
+    "category": "Kinematics: Relative Motion",
+    "statement": "A ship maintains a heading due east at 6 knots through a current flowing south. If the actual course results in a 10 nautical mile displacement over 2 hours, calculate the speed of the current $v_{curr}$.",
+    "targets": { "v_curr": 4.0 },
+    "required_units": ["knots"]
   }
 ]
