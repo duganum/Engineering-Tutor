@@ -41,14 +41,21 @@ def check_numeric_match(user_val, correct_val, tolerance=0.05):
         return False
 
 def evaluate_understanding_score(chat_history):
-    """강의 세션의 대화 내용을 바탕으로 이해도를 0-10점으로 평가합니다."""
+    """
+    강의 세션의 대화 내용을 바탕으로 이해도를 0-10점으로 평가합니다.
+    수식 사용 여부에 따라 점수 상한선을 둡니다.
+    """
     eval_instruction = (
-        "You are an expert engineering professor. Your task is to evaluate the student's level of understanding "
-        "based on the chat history. Rate the understanding from 0 to 10.\n"
-        "0: No participation or complete misunderstanding.\n"
-        "5: Basic grasp but struggles with core engineering logic.\n"
-        "10: Perfect conceptual mastery.\n"
-        "CRITICAL: Output ONLY the integer (e.g., '8'). No text, no explanation."
+        "You are a strict Engineering Professor at Texas A&M University - Corpus Christi. "
+        "Evaluate the student's level of understanding from 0 to 10 based ONLY on the chat history.\n\n"
+        "STRICT SCORING RUBRIC:\n"
+        "0-3: Little to no participation or irrelevant answers.\n"
+        "4-5: Good conversational engagement but NO use of governing equations or technical formulas.\n"
+        "6-8: Shows conceptual understanding and correctly identifies/uses the relevant equations.\n"
+        "9-10: Complete mastery, correct use of equations, and clear explanation of the physics logic.\n\n"
+        "CRITICAL RULE: If the student has not correctly mentioned or applied the RELEVANT EQUATIONS "
+        "for the topic, you MUST NOT give a score higher than 5, regardless of how well they talk. "
+        "Output ONLY the integer."
     )
     
     model = get_gemini_model(eval_instruction)
@@ -56,27 +63,30 @@ def evaluate_understanding_score(chat_history):
 
     try:
         response = model.generate_content(f"Chat history to evaluate:\n{chat_history}")
-        # Extract only the number from the response
+        # 숫자만 추출
         score_match = re.search(r"\d+", response.text)
-        return int(score_match.group()) if score_match else 0
+        if score_match:
+            score = int(score_match.group())
+            return min(max(score, 0), 10) # 0-10 사이 유지
+        return 0
     except Exception:
         return 0
 
 def analyze_and_send_report(user_name, topic_title, chat_history):
     """문제 풀이 또는 강의 세션을 분석하여 Dr. Um에게 이메일 리포트를 전송합니다."""
     
-    # Get the numerical score first to include in the report
+    # 이메일 전송 전 점수 산출
     score = evaluate_understanding_score(chat_history)
     
     report_instruction = (
-        "You are an academic evaluator at Texas A&M University - Corpus Christi. "
-        "Analyze this engineering education session (Problem Solving or Interactive Lecture).\n"
+        "You are an academic evaluator. Analyze this engineering session.\n"
         "Your report must include:\n"
-        "1. Session Overview: Focus of the discussion (e.g., Projectile Motion).\n"
-        "2. Understanding Score: A summary of why the student earned their score.\n"
-        "3. Concept Mastery: Strengths and gaps in the student's understanding.\n"
-        "4. Engagement Level: How effectively the student interacted with the Socratic Tutor.\n"
-        "5. CRITICAL: Quote exactly the section labeled '--- STUDENT FEEDBACK ---' in a part titled '**Student Feedback**'."
+        "1. Session Overview\n"
+        f"2. Numerical Understanding Score: {score}/10\n"
+        "3. Technical Accuracy: Did they use the correct equations?\n"
+        "4. Concept Mastery: Strengths and gaps.\n"
+        "5. Engagement Level\n"
+        "6. CRITICAL: Quote the section '--- STUDENT FEEDBACK ---' exactly."
     )
     
     model = get_gemini_model(report_instruction)
@@ -85,7 +95,7 @@ def analyze_and_send_report(user_name, topic_title, chat_history):
     prompt = (
         f"Student Name: {user_name}\n"
         f"Topic: {topic_title}\n"
-        f"Understanding Score (0-10): {score}\n\n"
+        f"Assigned Score: {score}/10\n\n"
         f"DATA:\n{chat_history}\n\n"
         "Please format the report professionally for Dr. Dugan Um."
     )
@@ -96,7 +106,7 @@ def analyze_and_send_report(user_name, topic_title, chat_history):
     except Exception as e:
         report_text = f"Analysis failed: {str(e)}"
 
-    # Email 전송 로직
+    # Email configuration
     sender = st.secrets["EMAIL_SENDER"]
     password = st.secrets["EMAIL_PASSWORD"] 
     receiver = "dugan.um@gmail.com" 
@@ -104,7 +114,7 @@ def analyze_and_send_report(user_name, topic_title, chat_history):
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = receiver
-    msg['Subject'] = f"Engineering Tutor Report ({user_name}): {topic_title} - Score: {score}/10"
+    msg['Subject'] = f"Eng. Tutor ({user_name}): {topic_title} [Score: {score}/10]"
     msg.attach(MIMEText(report_text, 'plain'))
 
     try:
