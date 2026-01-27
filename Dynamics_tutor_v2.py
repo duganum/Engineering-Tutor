@@ -55,19 +55,26 @@ if st.session_state.page == "landing":
     st.title(f"🚀 Welcome, {st.session_state.user_name}!")
     st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
     
-    # Section A: Interactive Lectures
+    # Section A: Interactive Lectures (Now with Relative Motion)
     st.markdown("---")
     st.subheader("💡 Interactive Learning Agents")
-    col_l1, col_l2, col_l3 = st.columns(3)
-    lectures = [("Projectile Motion", "K_2.2"), ("Normal & Tangent", "K_2.3"), ("Polar Coordinates", "K_2.4")]
+    col_l1, col_l2, col_l3, col_l4 = st.columns(4)
+    lectures = [
+        ("Projectile Motion", "K_2.2"), 
+        ("Normal & Tangent", "K_2.3"), 
+        ("Polar Coordinates", "K_2.4"),
+        ("Relative Motion", "K_2.5")
+    ]
     for i, (name, pref) in enumerate(lectures):
-        with [col_l1, col_l2, col_l3][i]:
+        with [col_l1, col_l2, col_l3, col_l4][i]:
             if st.button(f"🎓 Lecture: {name}", key=f"lec_{pref}", use_container_width=True):
-                st.session_state.lecture_topic = name; st.session_state.page = "lecture"; st.rerun()
+                st.session_state.lecture_topic = name
+                st.session_state.page = "lecture"
+                st.rerun()
 
     # Section B: Practice Problems
     st.markdown("---")
-    st.subheader("📝 Statics Review Problems")
+    st.subheader("📝 Engineering Review Problems")
     categories = {}
     for p in PROBLEMS:
         cat_main = p.get('category', 'General').split(":")[0].strip()
@@ -84,7 +91,9 @@ if st.session_state.page == "landing":
                     sub_label = prob.get('category', '').split(":")[-1].strip()
                     with cols[j]:
                         if st.button(f"**{sub_label}**\n({prob['id']})", key=f"btn_{prob['id']}", use_container_width=True):
-                            st.session_state.current_prob = prob; st.session_state.page = "chat"; st.rerun()
+                            st.session_state.current_prob = prob
+                            st.session_state.page = "chat"
+                            st.rerun()
     st.markdown("---")
 
 # --- Page 2: Socratic Chat (Practice Problems) ---
@@ -117,10 +126,9 @@ elif st.session_state.page == "chat":
     if p_id not in st.session_state.chat_sessions:
         sys_prompt = (
             f"You are the Engineering Tutor for {st.session_state.user_name} at TAMUCC. "
-            f"Context: {prob['statement']}. "
+            f"Context: {prob['statement']}. Use LaTeX for all math. "
             "STRICT RULES: 1. Do NOT answer your own questions. 2. NEVER ask 'what diagram' questions. "
-            "3. Respond ONLY after the student types something. 4. Use English only. "
-            "5. If the chat is empty, wait for the student to start. No long intros."
+            "3. Respond ONLY after the student types something. 4. Use English only."
         )
         model = get_gemini_model(sys_prompt)
         st.session_state.chat_sessions[p_id] = model.start_chat(history=[])
@@ -138,7 +146,7 @@ elif st.session_state.page == "chat":
                 st.session_state.grading_data[p_id]['solved'].add(target)
         st.session_state.chat_sessions[p_id].send_message(user_input); st.rerun()
 
-# --- Page 3: Interactive Lecture (With 0-10 Scaling) ---
+# --- Page 3: Interactive Lecture ---
 elif st.session_state.page == "lecture":
     topic = st.session_state.lecture_topic
     st.title(f"🎓 Lab: {topic}")
@@ -153,12 +161,20 @@ elif st.session_state.page == "lecture":
             st.latex(r"a_n = \frac{v^2}{\rho}")
         elif topic == "Polar Coordinates":
             params['r'] = st.slider("r", 1, 50, 20); params['theta'] = st.slider("theta", 0, 360, 45)
+        elif topic == "Relative Motion":
+            v_ax = st.slider("vA_x", -20, 20, 15)
+            v_ay = st.slider("vA_y", -20, 20, 5)
+            v_bx = st.slider("vB_x", -20, 20, 10)
+            v_by = st.slider("vB_y", -20, 20, -5)
+            params['vA'] = [v_ax, v_ay]
+            params['vB'] = [v_bx, v_by]
+            st.latex(r"\vec{v}_A = \vec{v}_B + \vec{v}_{A/B}")
         
         st.image(render_lecture_visual(topic, params))
         
         st.markdown("---")
         st.subheader("📊 Session Completion")
-        lecture_feedback = st.text_area("Final Summary:", placeholder="Summarize the derivations you just learned.")
+        lecture_feedback = st.text_area("Final Summary:", placeholder="Summarize the governing equations.")
         
         if st.button("🚀 Submit Lecture Report (Score 0-10)", use_container_width=True):
             history_text = ""
@@ -167,34 +183,29 @@ elif st.session_state.page == "lecture":
                     role = "Professor" if msg.role == "model" else "Student"
                     history_text += f"{role}: {msg.parts[0].text}\n"
             
-            with st.spinner("Analyzing mastery of equations (0-10)..."):
-                scoring_prompt = (
-                    f"Evaluate the student's understanding of {topic} on a scale of 0 to 10. "
-                    "If they completely understand all relevant equations and derivations, give them a 10. "
-                    f"Student Summary: {lecture_feedback}\n\nChat History:\n{history_text}"
-                )
-                report = analyze_and_send_report(st.session_state.user_name, f"LECTURE SCORE: {topic}", scoring_prompt)
+            with st.spinner("Analyzing mastery..."):
+                report = analyze_and_send_report(st.session_state.user_name, f"LECTURE: {topic}", history_text + f"\n--- STUDENT FEEDBACK ---\n{lecture_feedback}")
                 st.session_state.last_report = report
                 st.session_state.page = "report_view"; st.rerun()
 
-        if st.button("🏠 Exit without Report", use_container_width=True):
+        if st.button("🏠 Exit", use_container_width=True):
             st.session_state.lecture_session = None; st.session_state.page = "landing"; st.rerun()
 
     with col_chat:
         st.subheader("💬 Socratic Discussion")
         if "lecture_session" not in st.session_state or st.session_state.lecture_session is None:
             sys_msg = (
-                f"You are a Professor at TAMUCC teaching {topic}. Respond only in English. "
-                "Use the Socratic method to lead the student through the derivation. "
-                "Challenge them on the math and equations. Ask one targeted question at a time and wait."
+                f"You are a Professor at TAMUCC teaching {topic}. Respond only in English and use LaTeX. "
+                "Guide the student through the vector derivations or equations using the Socratic method. "
+                "Do not give answers immediately. Ask one targeted question at a time."
             )
             model = get_gemini_model(sys_msg)
             st.session_state.lecture_session = model.start_chat(history=[])
-            st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}. Look at the simulation. How does changing the variables affect the acceleration equations?")
+            st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}. Looking at the {topic} simulation, how would you define the relationship between the vectors shown?")
         
         for msg in st.session_state.lecture_session.history:
             with st.chat_message("assistant" if msg.role == "model" else "user"):
-                st.write(msg.parts[0].text)
+                st.markdown(msg.parts[0].text)
         
         if lecture_input := st.chat_input("Discuss the physics..."):
             st.session_state.lecture_session.send_message(lecture_input); st.rerun()
