@@ -87,7 +87,7 @@ if st.session_state.page == "landing":
                             st.session_state.current_prob = prob; st.session_state.page = "chat"; st.rerun()
     st.markdown("---")
 
-# --- Page 2: Socratic Chat ---
+# --- Page 2: Socratic Chat (Practice Problems) ---
 elif st.session_state.page == "chat":
     prob = st.session_state.current_prob
     p_id = prob['id']
@@ -104,7 +104,7 @@ elif st.session_state.page == "chat":
         st.metric("Variables Found", f"{len(solved)} / {len(prob['targets'])}")
         st.progress(len(solved) / len(prob['targets']) if len(prob['targets']) > 0 else 0)
         feedback = st.text_area("Notes for Dr. Um:", placeholder="What was the hardest part?")
-        if st.button("⬅️ Submit Session"):
+        if st.button("⬅️ Submit Session", use_container_width=True):
             history_text = ""
             if p_id in st.session_state.chat_sessions:
                 for msg in st.session_state.chat_sessions[p_id].history:
@@ -119,7 +119,8 @@ elif st.session_state.page == "chat":
             f"You are the Engineering Tutor for {st.session_state.user_name} at TAMUCC. "
             f"Context: {prob['statement']}. "
             "STRICT RULES: 1. Do NOT answer your own questions. 2. NEVER ask 'what diagram' questions. "
-            "3. Respond ONLY after the student types something. 4. Use English only."
+            "3. Respond ONLY after the student types something. 4. Use English only. "
+            "5. If the chat is empty, wait for the student to start. No long intros."
         )
         model = get_gemini_model(sys_prompt)
         st.session_state.chat_sessions[p_id] = model.start_chat(history=[])
@@ -129,7 +130,7 @@ elif st.session_state.page == "chat":
             st.markdown(message.parts[0].text)
 
     if not st.session_state.chat_sessions[p_id].history:
-        st.write("👋 **Tutor Ready.** Please describe the first step of your analysis.")
+        st.write("👋 **Tutor Ready.** Please describe the first step of your analysis to begin.")
 
     if user_input := st.chat_input("Your analysis..."):
         for target, val in prob['targets'].items():
@@ -137,7 +138,7 @@ elif st.session_state.page == "chat":
                 st.session_state.grading_data[p_id]['solved'].add(target)
         st.session_state.chat_sessions[p_id].send_message(user_input); st.rerun()
 
-# --- Page 3: Interactive Lecture (With Added Reporting) ---
+# --- Page 3: Interactive Lecture (With 0-10 Scaling) ---
 elif st.session_state.page == "lecture":
     topic = st.session_state.lecture_topic
     st.title(f"🎓 Lab: {topic}")
@@ -157,37 +158,39 @@ elif st.session_state.page == "lecture":
         
         st.markdown("---")
         st.subheader("📊 Session Completion")
-        lecture_feedback = st.text_area("What is your level of understanding?", placeholder="Briefly summarize what you learned or what is still unclear.")
+        lecture_feedback = st.text_area("Final Summary:", placeholder="Summarize the derivations you just learned.")
         
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("🚀 Submit Lecture Report", use_container_width=True):
-                history_text = ""
-                if "lecture_session" in st.session_state and st.session_state.lecture_session:
-                    for msg in st.session_state.lecture_session.history:
-                        role = "Professor" if msg.role == "model" else "Student"
-                        history_text += f"{role}: {msg.parts[0].text}\n"
-                
-                with st.spinner("Analyzing lecture participation..."):
-                    # Utilizing the existing analyze_and_send_report for lecture context
-                    report = analyze_and_send_report(
-                        st.session_state.user_name, 
-                        f"LECTURE: {topic}", 
-                        f"Student Summary: {lecture_feedback}\n\nFull Interaction:\n{history_text}"
-                    )
-                    st.session_state.last_report = report
-                    st.session_state.page = "report_view"; st.rerun()
-        with c2:
-            if st.button("🏠 Exit without Report", use_container_width=True):
-                st.session_state.lecture_session = None; st.session_state.page = "landing"; st.rerun()
+        if st.button("🚀 Submit Lecture Report (Score 0-10)", use_container_width=True):
+            history_text = ""
+            if "lecture_session" in st.session_state and st.session_state.lecture_session:
+                for msg in st.session_state.lecture_session.history:
+                    role = "Professor" if msg.role == "model" else "Student"
+                    history_text += f"{role}: {msg.parts[0].text}\n"
+            
+            with st.spinner("Analyzing mastery of equations (0-10)..."):
+                scoring_prompt = (
+                    f"Evaluate the student's understanding of {topic} on a scale of 0 to 10. "
+                    "If they completely understand all relevant equations and derivations, give them a 10. "
+                    f"Student Summary: {lecture_feedback}\n\nChat History:\n{history_text}"
+                )
+                report = analyze_and_send_report(st.session_state.user_name, f"LECTURE SCORE: {topic}", scoring_prompt)
+                st.session_state.last_report = report
+                st.session_state.page = "report_view"; st.rerun()
+
+        if st.button("🏠 Exit without Report", use_container_width=True):
+            st.session_state.lecture_session = None; st.session_state.page = "landing"; st.rerun()
 
     with col_chat:
         st.subheader("💬 Socratic Discussion")
         if "lecture_session" not in st.session_state or st.session_state.lecture_session is None:
-            sys_msg = f"You are a Professor at TAMUCC teaching {topic}. Respond only in English. Use a Socratic method to lead the student through the derivation. Ask one targeted question at a time and wait for their response."
+            sys_msg = (
+                f"You are a Professor at TAMUCC teaching {topic}. Respond only in English. "
+                "Use the Socratic method to lead the student through the derivation. "
+                "Challenge them on the math and equations. Ask one targeted question at a time and wait."
+            )
             model = get_gemini_model(sys_msg)
             st.session_state.lecture_session = model.start_chat(history=[])
-            st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}. Looking at the {topic} simulation, how does changing the sliders affect the system's behavior?")
+            st.session_state.lecture_session.send_message(f"Hello {st.session_state.user_name}. Look at the simulation. How does changing the variables affect the acceleration equations?")
         
         for msg in st.session_state.lecture_session.history:
             with st.chat_message("assistant" if msg.role == "model" else "user"):
