@@ -52,7 +52,8 @@ if st.session_state.user_name is None:
 
 # --- Page 1: Main Menu ---
 if st.session_state.page == "landing":
-    st.title(f"🚀 Welcome, {st.session_state.user_name}!")
+    st.title("🏗️ Engineering Statics")  # Heading moved to the top
+    st.subheader(f"Welcome, {st.session_state.user_name}!") # Welcome moved below
     st.info("Texas A&M University - Corpus Christi | Dr. Dugan Um")
     
     # Section A: Interactive Lectures (Now with Relative Motion)
