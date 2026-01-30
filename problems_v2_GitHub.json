@@ -1,1052 +1,171 @@
 [
   {
-    "id": "CAL_1_1",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the derivative of $f(x) = 3x^4 - 5x^2 + 2x - 10$ at $x = 1$.",
-    "targets": { "f'(1)": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_2",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Evaluate the limit $\\lim_{x \\to 0} \\frac{\\sin(4x)}{x}$ using L'Hôpital's Rule.",
-    "targets": { "Limit": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_3",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the slope of the curve $y = \\sqrt{x}$ at $x = 9$.",
-    "targets": { "m": 0.167 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_4",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "A particle moves according to $s(t) = t^3 - 3t$. Find the acceleration ($a$) at $t = 2$.",
-    "targets": { "a": 12.0 },
-    "required_units": ["m/s^2"]
-  },
-  {
-    "id": "CAL_1_5",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the maximum value of $f(x) = -x^2 + 4x + 5$.",
-    "targets": { "f_max": 9.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_6",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the derivative of $f(x) = \\ln(x^2 + 1)$ at $x = 1$.",
-    "targets": { "f'(1)": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_7",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Determine the derivative of $y = e^{-2x}$ at $x = 0$.",
-    "targets": { "dy/dx": -2.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_8",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "If $y = \\tan(x)$, what is the slope of the tangent line at $x = \\pi/4$?",
-    "targets": { "slope": 2.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_9",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Evaluate the limit $\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}$.",
-    "targets": { "Limit": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_10",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find $dy/dx$ at $(3, 4)$ for the implicit function $x^2 + y^2 = 25$.",
-    "targets": { "dy/dx": -0.75 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_11",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Evaluate $\\lim_{x \\to 0} \\frac{e^x - 1}{x}$.",
-    "targets": { "Limit": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_12",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the derivative of $f(x) = \\cos^2(x)$ at $x = \\pi/4$.",
-    "targets": { "f'(\\pi/4)": -1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_13",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "What is the second derivative $f''(x)$ of $f(x) = x^3 - 6x^2$ at $x = 3$?",
-    "targets": { "f''(3)": 6.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_14",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the critical point $x$ of the function $f(x) = x^2 - 8x + 10$.",
-    "targets": { "x": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_15",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Evaluate $\\lim_{x \\to \\infty} \\frac{5x^2 + 3x}{2x^2 - 1}$.",
-    "targets": { "Limit": 2.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_16",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the derivative of $y = (2x + 3)^3$ at $x = -1$.",
-    "targets": { "dy/dx": 6.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_17",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "If $f(x) = x \\ln(x)$, find $f'(e)$.",
-    "targets": { "f'(e)": 2.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_18",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Calculate $\\lim_{x \\to 0} \\frac{1 - \\cos(x)}{x^2}$.",
-    "targets": { "Limit": 0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_19",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the slope of $y = e^{x^2}$ at $x = 1$. (Use $e = 2.718$)",
-    "targets": { "slope": 5.436 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_20",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Determine the time $t$ when the velocity is zero for a particle with position $s(t) = t^2 - 6t + 8$.",
-    "targets": { "t": 3.0 },
-    "required_units": ["s"]
-  },
-  {
-    "id": "CAL_1_21",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Evaluate $\\lim_{x \\to 1} \\frac{\\ln(x)}{x - 1}$.",
-    "targets": { "Limit": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_22",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find $dy/dx$ for $y = \\frac{x}{x+1}$ at $x = 1$.",
-    "targets": { "dy/dx": 0.25 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_23",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the derivative of $f(x) = 5^x$ at $x = 0$. (Use $\\ln 5 = 1.609$)",
-    "targets": { "f'(0)": 1.609 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_24",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "What is the derivative of $y = \\arcsin(x)$ at $x = 0$?",
-    "targets": { "dy/dx": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_25",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the local minimum of $f(x) = x^2 - 4x + 7$.",
-    "targets": { "f_min": 3.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_26",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the slope of $y = x^3$ at $x = -2$.",
-    "targets": { "slope": 12.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_27",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Evaluate $\\lim_{x \\to 0} \\frac{\\tan(x)}{x}$.",
-    "targets": { "Limit": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_28",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find $dy/dx$ if $y = \\cos(x^2)$ at $x = \\sqrt{\\pi/2}$.",
-    "targets": { "dy/dx": -2.507 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_29",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Calculate the derivative of $f(x) = \\sqrt{x^2 + 9}$ at $x = 4$.",
-    "targets": { "f'(4)": 0.8 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_1_30",
-    "category": "Mathematics: Calculus - Derivatives",
-    "statement": "Find the equation of the tangent line slope for $y = 2/x$ at $x = 2$.",
-    "targets": { "slope": -0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_1",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate the definite integral $\\int_1^2 (x^2 - 1) dx$.",
-    "targets": { "Value": 1.333 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_2",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the area under the curve $f(x) = \\sin(x)$ from $x = 0$ to $x = \\pi$.",
-    "targets": { "Area": 2.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_3",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Calculate the average value of $f(x) = 3x^2$ on the interval $[0, 2]$.",
-    "targets": { "f_avg": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_4",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^1 e^{2x} dx$. (Use $e = 2.718$)",
-    "targets": { "Value": 3.195 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_5",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the area between the curves $y = x$ and $y = x^2$ from $x = 0$ to $x = 1$.",
-    "targets": { "Area": 0.167 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_6",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate the integral $\\int_0^{\\pi/2} \\cos(x) dx$.",
-    "targets": { "Value": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_7",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the definite integral $\\int_1^e \\frac{1}{x} dx$.",
-    "targets": { "Value": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_8",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^1 (4x^3 + 3x^2) dx$.",
-    "targets": { "Value": 2.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_9",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Calculate the volume of the solid generated by revolving $y = x$ about the x-axis from $x=0$ to $x=2$. (Use $\\pi = 3.142$)",
-    "targets": { "V": 8.378 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_10",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate the integral $\\int x e^{x^2} dx$ from $x=0$ to $x=1$.",
-    "targets": { "Value": 0.859 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_11",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the area under $y = 1/x^2$ from $x=1$ to $x=2$.",
-    "targets": { "Area": 0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_12",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^2 (x-1)^2 dx$.",
-    "targets": { "Value": 0.667 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_13",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the integral of $f(x) = \\sec^2(x)$ from $x=0$ to $x=\\pi/4$.",
-    "targets": { "Value": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_14",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^1 \\frac{1}{1+x^2} dx$. (Result in radians, use $\\pi = 3.142$)",
-    "targets": { "Value": 0.785 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_15",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Calculate the work done by a force $F(x) = 10x$ moving an object from $x=0$ to $x=4$.",
-    "targets": { "Work": 80.0 },
-    "required_units": ["j"]
-  },
-  {
-    "id": "CAL_2_16",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the average value of $f(x) = \\sin(x)$ on $[0, \\pi]$.",
-    "targets": { "f_avg": 0.637 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_17",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^1 x \\sqrt{x^2+1} dx$.",
-    "targets": { "Value": 0.609 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_18",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the x-coordinate of the centroid ($\\bar{x}$) for the area under $y=x$ from $x=0$ to $x=1$.",
-    "targets": { "x_bar": 0.667 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_19",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^1 (2x+1)^3 dx$.",
-    "targets": { "Value": 10.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_20",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Determine the value of $\\int_1^4 \\sqrt{x} dx$.",
-    "targets": { "Value": 4.667 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_21",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^1 x e^x dx$ using integration by parts.",
-    "targets": { "Value": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_22",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the area under $y = e^{-x}$ from $x=0$ to $x=\\infty$.",
-    "targets": { "Area": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_23",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^{\\pi} \\sin^2(x) dx$. (Use $\\pi = 3.142$)",
-    "targets": { "Value": 1.571 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_24",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the integral $\\int \\frac{\\ln(x)}{x} dx$ from $x=1$ to $x=e$.",
-    "targets": { "Value": 0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_25",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Calculate $\\int_2^3 (x^3 - 2x) dx$.",
-    "targets": { "Value": 11.25 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_26",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the area under $y = x^3$ from $x=0$ to $x=2$.",
-    "targets": { "Area": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_27",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^1 \\frac{x}{x^2+1} dx$.",
-    "targets": { "Value": 0.347 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_28",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Find the volume of a sphere with radius $r=1$ using integration. (Use $\\pi = 3.142$)",
-    "targets": { "V": 4.189 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_29",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Evaluate $\\int_0^{\\pi/4} \\tan(x) \\sec^2(x) dx$.",
-    "targets": { "Value": 0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_2_30",
-    "category": "Mathematics: Calculus - Integrals",
-    "statement": "Calculate $\\int_0^2 |x-1| dx$.",
-    "targets": { "Value": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_1",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the partial derivative $\\frac{\\partial f}{\\partial x}$ for $f(x, y) = x^2y + y^3$ at $(2, 1)$.",
-    "targets": { "df/dx": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_2",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Determine $\\frac{\\partial f}{\\partial y}$ for $f(x, y) = x^2y + y^3$ at $(2, 1)$.",
-    "targets": { "df/dy": 7.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_3",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find $\\frac{\\partial z}{\\partial x}$ if $z = e^{xy}$ at the point $(1, 2)$. (Use $e = 2.718$)",
-    "targets": { "dz/dx": 14.778 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_4",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Calculate the first partial derivative with respect to $x$ for $f(x, y) = \\ln(x^2 + y^2)$ at $(1, 1)$.",
-    "targets": { "f_x": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_5",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the second partial derivative $\\frac{\\partial^2 f}{\\partial x^2}$ for $f(x, y) = x^3 y^2$.",
-    "targets": { "f_xx": "6xy^2" },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_6",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Evaluate $\\frac{\\partial z}{\\partial y}$ for $z = \\sin(x) \\cos(y)$ at $(\\pi/2, 0)$.",
-    "targets": { "dz/dy": 0.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_7",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Using the Ideal Gas Law $P = \\frac{nRT}{V}$, find $\\frac{\\partial P}{\\partial V}$ if $n, R, T$ are constant.",
-    "targets": { "dP/dV": "-nRT/V^2" },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_8",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the mixed partial derivative $\\frac{\\partial^2 f}{\\partial x \\partial y}$ for $f(x, y) = x^2 y + 5y$.",
-    "targets": { "f_xy": "2x" },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_9",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Calculate the gradient magnitude $|\\nabla f|$ for $f(x, y) = 3x + 4y$.",
-    "targets": { "magnitude": 5.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_10",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Determine the total differential $dz$ for $z = x^2 + y^2$ when $dx = 0.1, dy = 0.2$ at $(1, 1)$.",
-    "targets": { "dz": 0.6 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_11",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find $\\frac{\\partial f}{\\partial x}$ for $f(x, y) = \\frac{x}{y}$ at $(4, 2)$.",
-    "targets": { "f_x": 0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_12",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find $\\frac{\\partial f}{\\partial y}$ for $f(x, y) = \\frac{x}{y}$ at $(4, 2)$.",
-    "targets": { "f_y": -1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_13",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Evaluate the partial derivative of $f(x, y) = x^y$ with respect to $x$ at $(2, 3)$.",
-    "targets": { "f_x": 12.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_14",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "For $f(x, y) = e^{x-y}$, find the value of $\\frac{\\partial f}{\\partial x} + \\frac{\\partial f}{\\partial y}$.",
-    "targets": { "sum": 0.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_15",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Determine $\\frac{\\partial z}{\\partial x}$ if $x^2 + y^2 + z^2 = 9$ (Implicit differentiation) at $(1, 2, 2)$.",
-    "targets": { "dz/dx": -0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_16",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the slope in the x-direction for the surface $z = x^2 - y^2$ at $(2, 1)$.",
-    "targets": { "slope_x": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_17",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "If $f(x, y, z) = xy + yz + zx$, find $\\frac{\\partial f}{\\partial z}$ at $(1, 2, 3)$.",
-    "targets": { "f_z": 3.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_18",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Calculate the rate of change of $P$ with respect to $T$ in $PV = nRT$ if $V$ is constant ($n=1, R=8.314, V=0.1$).",
-    "targets": { "dP/dT": 83.14 },
-    "required_units": ["Pa/K"]
-  },
-  {
-    "id": "CAL_3_19",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the second partial derivative $\\frac{\\partial^2 z}{\\partial y^2}$ for $z = x^2 y^3$.",
-    "targets": { "z_yy": "6x^2y" },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_20",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "For $f(x, y) = \\sqrt{x^2 + y^2}$, calculate $f_x$ at $(3, 4)$.",
-    "targets": { "f_x": 0.6 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_21",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Determine $\\frac{\\partial f}{\\partial x}$ for $f(x, y) = y \\sin(xy)$ at $(1, \\pi)$.",
-    "targets": { "f_x": -9.87 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_22",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the critical point $(\\bar{x}, \\bar{y})$ of $f(x, y) = x^2 + y^2 - 4x + 6y$. (Answer for x only)",
-    "targets": { "x": 2.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_23",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Calculate $f_y$ at $(0, 0)$ for $f(x, y) = e^x \\cos(y)$.",
-    "targets": { "f_y": 0.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_24",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the 전미분(Total Differential) $df$ for $f = x^2 y$ at $x=2, y=3$ with $dx=0.01, dy=0.02$.",
-    "targets": { "df": 0.2 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_25",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "If $u = x^2 + y^2$ and $x=r\\cos\\theta, y=r\\sin\\theta$, find $\\frac{\\partial u}{\\partial r}$.",
-    "targets": { "du/dr": "2r" },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_26",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the Laplace operator $\\nabla^2 f = f_{xx} + f_{yy}$ for $f(x, y) = x^2 - y^2$.",
-    "targets": { "result": 0.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_27",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Evaluate $\\frac{\\partial^2 z}{\\partial x \\partial y}$ for $z = \\ln(xy)$.",
-    "targets": { "z_xy": 0.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_28",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Determine the slope of $z = 10 - x^2 - 2y^2$ in the y-direction at $(1, 1)$.",
-    "targets": { "slope_y": -4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_29",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Calculate $f_x(1, 1)$ if $f(x, y) = (x+y)^2$.",
-    "targets": { "f_x": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_3_30",
-    "category": "Mathematics: Calculus - Partial Derivatives",
-    "statement": "Find the partial derivative of $V = \\pi r^2 h$ with respect to $r$ at $r=2, h=5$. (Use $\\pi = 3.14$)",
-    "targets": { "dV/dr": 62.8 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_1",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the magnitude of the vector $\\mathbf{A} = 3\\mathbf{i} + 4\\mathbf{j}$.",
-    "targets": { "magnitude": 5.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_2",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Calculate the dot product of $\\mathbf{A} = [2, 3]$ and $\\mathbf{B} = [4, -1]$.",
-    "targets": { "dot": 5.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_3",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the cross product $\\mathbf{A} \\times \\mathbf{B}$ magnitude if $\\mathbf{A} = [1, 0, 0]$ and $\\mathbf{B} = [0, 1, 0]$.",
-    "targets": { "magnitude": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_4",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Determine the angle (in degrees) between $\\mathbf{A} = [1, 1]$ and $\\mathbf{B} = [1, 0]$.",
-    "targets": { "theta": 45.0 },
-    "required_units": ["deg"]
-  },
-  {
-    "id": "CAL_4_5",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the unit vector in the direction of $\\mathbf{A} = 6\\mathbf{i} + 8\\mathbf{j}$. (Answer the i-component only)",
-    "targets": { "u_i": 0.6 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_6",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Calculate the dot product of $\\mathbf{A} = 2\\mathbf{i} + 5\\mathbf{j} - 3\\mathbf{k}$ and $\\mathbf{B} = 4\\mathbf{i} - 2\\mathbf{j} + 1\\mathbf{k}$.",
-    "targets": { "dot": -5.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_7",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the scalar projection of $\\mathbf{A} = [4, 1]$ onto $\\mathbf{B} = [1, 0]$.",
-    "targets": { "proj": 4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_8",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Determine the magnitude of vector $\\mathbf{V} = \\mathbf{i} + \\mathbf{j} + \\mathbf{k}$.",
-    "targets": { "magnitude": 1.732 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_9",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Calculate the work done ($W = \\mathbf{F} \\cdot \\mathbf{d}$) if $\\mathbf{F} = [10, 20]$ N and $\\mathbf{d} = [3, 2]$ m.",
-    "targets": { "W": 70.0 },
-    "required_units": ["j"]
-  },
-  {
-    "id": "CAL_4_10",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the k-component of the cross product $\\mathbf{A} \\times \\mathbf{B}$ where $\\mathbf{A} = [2, 1, 0]$ and $\\mathbf{B} = [1, 3, 0]$.",
-    "targets": { "k_comp": 5.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_11",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "If $\\mathbf{A} \\cdot \\mathbf{B} = 0$, what is the angle between the two vectors in degrees?",
-    "targets": { "theta": 90.0 },
-    "required_units": ["deg"]
-  },
-  {
-    "id": "CAL_4_12",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the magnitude of $2\\mathbf{A}$ if $\\mathbf{A} = [3, -4]$.",
-    "targets": { "magnitude": 10.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_13",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Calculate the distance between points $P_1(1, 2, 3)$ and $P_2(4, 6, 3)$.",
-    "targets": { "distance": 5.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_14",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Determine the value of $k$ such that $\\mathbf{A} = [2, k]$ and $\\mathbf{B} = [4, 2]$ are perpendicular.",
-    "targets": { "k": -4.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_15",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the area of a parallelogram spanned by $\\mathbf{A} = [2, 0, 0]$ and $\\mathbf{B} = [0, 3, 0]$.",
-    "targets": { "area": 6.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_16",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the sum of vectors $\\mathbf{A} = [1, 2, 3]$ and $\\mathbf{B} = [4, 5, 6]$. (Answer the magnitude)",
-    "targets": { "magnitude": 12.45 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_17",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "What is the dot product of a unit vector with itself?",
-    "targets": { "result": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_18",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Calculate $|\\mathbf{A} - \\mathbf{B}|$ if $\\mathbf{A} = [5, 10]$ and $\\mathbf{B} = [2, 6]$.",
-    "targets": { "magnitude": 5.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_19",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the gradient vector $\\nabla f$ of $f(x, y) = x^2 + y^2$ at $(1, 2)$. (Answer the magnitude)",
-    "targets": { "magnitude": 4.472 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_20",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the direction cosines $\\cos(\\alpha)$ for vector $\\mathbf{A} = 3\\mathbf{i} + 4\\mathbf{j}$.",
-    "targets": { "cos_alpha": 0.6 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_21",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Determine the cross product $\\mathbf{j} \\times \\mathbf{i}$.",
-    "targets": { "result": -1.0 },
-    "required_units": ["k"]
-  },
-  {
-    "id": "CAL_4_22",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the scalar triple product $\\mathbf{A} \\cdot (\\mathbf{B} \\times \\mathbf{C})$ if $\\mathbf{A}=[1,0,0], \\mathbf{B}=[0,1,0], \\mathbf{C}=[0,0,1]$.",
-    "targets": { "result": 1.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_4_23",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Calculate the magnitude of force $\\mathbf{F} = [2, -3, 6]$ N.",
-    "targets": { "F": 7.0 },
+    "id": "S_1.1_1",
+    "category": "Statics: Free Body Diagram",
+    "statement": "A 50 kg mass is suspended by two cables. Cable A is horizontal, and Cable B is at 45 degrees. Find the Tension in Cable B ($T_B$). Use $g = 9.81 m/s^2$.",
+    "targets": { "T_B": 693.67 },
     "required_units": ["n"]
   },
   {
-    "id": "CAL_4_24",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the angle between $\\mathbf{A} = [1, 2, 2]$ and the z-axis in degrees.",
-    "targets": { "theta": 48.19 },
-    "required_units": ["deg"]
+    "id": "S_1.1_2",
+    "category": "Statics: Free Body Diagram",
+    "statement": "A 20 kg cylinder rests on a smooth 30-degree incline. Find the Normal Force ($N$) acting on the cylinder.",
+    "targets": { "N": 169.91 },
+    "required_units": ["n"]
   },
   {
-    "id": "CAL_4_25",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "If $|\\mathbf{A}|=5$ and $|\\mathbf{B}|=2$, and the angle between them is 60°, find $\\mathbf{A} \\cdot \\mathbf{B}$.",
-    "targets": { "dot": 5.0 },
+    "id": "S_1.1_3",
+    "category": "Statics: Free Body Diagram",
+    "statement": "A uniform 10 kg beam is supported by a pin at A and a cable at B. Find the vertical Reaction Force at A ($A_y$).",
+    "targets": { "A_y": 49.05 },
+    "required_units": ["n"]
+  },
+  {
+    "id": "S_1.2_1",
+    "category": "Statics: Truss",
+    "statement": "In a simple bridge truss, a vertical load of 10 kN is applied at the center. If the truss is symmetric, find the Support Reaction ($R$) at one end.",
+    "targets": { "R": 5000 },
+    "required_units": ["n", "kn"]
+  },
+  {
+    "id": "S_1.2_2",
+    "category": "Statics: Truss",
+    "statement": "For a triangle truss with 60-degree angles and a 5 kN load at the top vertex, find the Force in the horizontal member ($F_{AB}$).",
+    "targets": { "F_{AB}": 1.44 },
+    "required_units": ["kn", "n"]
+  },
+  {
+    "id": "S_1.2_3",
+    "category": "Statics: Truss",
+    "statement": "Identify the number of Zero-Force Members in a Pratt truss under a single point load at the support.",
+    "targets": { "ZFM": 2 },
     "required_units": [""]
   },
   {
-    "id": "CAL_4_26",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the projection of $\\mathbf{A} = 2\\mathbf{i} + 3\\mathbf{j}$ onto the y-axis.",
-    "targets": { "proj": 3.0 },
-    "required_units": [""]
+    "id": "S_1.3_1",
+    "category": "Statics: Geometric Properties",
+    "statement": "Find the Centroid ($\\bar{y}$) of a rectangle with base 4 m and height 6 m relative to the base.",
+    "targets": { "y": 3.0 },
+    "required_units": ["m"]
   },
   {
-    "id": "CAL_4_27",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Calculate the magnitude of $\\mathbf{A} \\times \\mathbf{B}$ if $|\\mathbf{A}|=10, |\\mathbf{B}|=2$ and $\\theta = 30^\\circ$.",
-    "targets": { "magnitude": 10.0 },
-    "required_units": [""]
+    "id": "S_1.3_2",
+    "category": "Statics: Geometric Properties",
+    "statement": "Calculate the Area Moment of Inertia ($I_x$) for a square section with side length $a = 0.2 m$.",
+    "targets": { "I_x": 0.000133 },
+    "required_units": ["m^4", "m4"]
   },
   {
-    "id": "CAL_4_28",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the unit vector orthogonal to both $\\mathbf{i}$ and $\\mathbf{j}$.",
-    "targets": { "result": 1.0 },
-    "required_units": ["k"]
+    "id": "S_1.3_3",
+    "category": "Statics: Geometric Properties",
+    "statement": "Find the Area of a circle with a diameter of 0.5 m.",
+    "targets": { "Area": 0.196 },
+    "required_units": ["m^2", "m2"]
   },
   {
-    "id": "CAL_4_29",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "What is the dot product of $[k, 2]$ and $[2, -1]$ if they are orthogonal?",
-    "targets": { "k": 1.0 },
-    "required_units": [""]
+    "id": "S_1.4_1",
+    "category": "Statics: Equilibrium",
+    "statement": "A rigid bar is balanced on a pivot. A 10 N force is 2 m left of the pivot. What Force ($F$) is needed 4 m right of the pivot to maintain equilibrium?",
+    "targets": { "F": 5.0 },
+    "required_units": ["n"]
   },
   {
-    "id": "CAL_4_30",
-    "category": "Mathematics: Calculus - Vector Analysis",
-    "statement": "Find the magnitude of the displacement vector from $(1, 1, 1)$ to $(3, 3, 2)$.",
-    "targets": { "magnitude": 3.0 },
-    "required_units": [""]
+    "id": "S_1.4_2",
+    "category": "Statics: Equilibrium",
+    "statement": "Find the Moment ($M$) at the fixed support of a 3 m cantilever beam with a 100 N downward force at the tip.",
+    "targets": { "M": 300.0 },
+    "required_units": ["nm"]
   },
   {
-    "id": "CAL_5_1",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate the double integral $\\int_0^1 \\int_0^2 x dy dx$.",
-    "targets": { "Value": 1.0 },
-    "required_units": [""]
+    "id": "S_1.4_3",
+    "category": "Statics: Equilibrium",
+    "statement": "Two people carry a 60 kg log. Person A is at one end, Person B is 1/3 from the other end. Find Force ($F_B$).",
+    "targets": { "F_B": 441.45 },
+    "required_units": ["n"]
   },
   {
-    "id": "CAL_5_2",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Calculate $\\int_0^2 \\int_0^1 (x + y) dx dy$.",
-    "targets": { "Value": 3.0 },
-    "required_units": [""]
+    "id": "K_2.2_1",
+    "category": "Kinematics: Projectile Motion",
+    "statement": "A rocket runs out of fuel in the position shown and continues in unpowered flight above the atmosphere. If its velocity in this position was 600 mi/hr, calculate the maximum additional altitude $h$ acquired and the corresponding time $t$ to reach it. The gravitational acceleration during this phase of its flight is 30.8 ft/sec$^2$.",
+    "targets": { "h": 12590, "t": 28.6 },
+    "required_units": ["ft", "s"]
   },
   {
-    "id": "CAL_5_3",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the area of a rectangle with $0 \\le x \\le 3$ and $0 \\le y \\le 4$ using double integration.",
-    "targets": { "Area": 12.0 },
-    "required_units": [""]
+    "id": "K_2.2_2",
+    "category": "Kinematics: Projectile Motion",
+    "statement": "A roofer tosses a small tool to the ground. What minimum magnitude $v_0$ of horizontal velocity is required to just miss the roof corner $B$? Also determine the distance $d$.",
+    "targets": { "v_0": 6.67, "d": 8.01 },
+    "required_units": ["ft/sec", "ft"]
   },
   {
-    "id": "CAL_5_4",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^1 \\int_0^x dy dx$.",
-    "targets": { "Value": 0.5 },
-    "required_units": [""]
+    "id": "K_2.2_3",
+    "category": "Kinematics: Projectile Motion",
+    "statement": "The center of mass $G$ of a high jumper follows the trajectory shown. Determine the component $v_0$, measured in the vertical plane of the figure, of his take-off velocity and angle $\\theta$ if the apex of the trajectory just clears the bar at $A$. (In general, must the mass center $G$ of the jumper clear the bar during a successful jump?)",
+    "targets": { "v_0": 16.03, "theta": 63.3 },
+    "required_units": ["ft/sec", "deg"]
   },
   {
-    "id": "CAL_5_5",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the area of a triangle bounded by $y=x$, $x=1$, and $y=0$ using double integrals.",
-    "targets": { "Area": 0.5 },
-    "required_units": [""]
+    "id": "K_2.3_1",
+    "category": "Kinematics: Normal & Tangent",
+    "statement": "Determine the maximum speed for each car if the normal acceleration is limited to 0.88g. The roadway is unbanked and level.",
+    "targets": { "v_max": 25.0 },
+    "required_units": ["m/s"]
   },
   {
-    "id": "CAL_5_6",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^{\\pi} \\int_0^1 r dr d\\theta$ (Area of a semi-circle with $r=1$). Use $\\pi = 3.142$.",
-    "targets": { "Area": 1.571 },
-    "required_units": [""]
+    "id": "K_2.3_2",
+    "category": "Kinematics: Normal & Tangent",
+    "statement": "The driver of the truck has an acceleration of 0.4g as the truck passes over the top $A$ of the hump in the road at constant speed. The radius of curvature of the road at the top of the hump is 98 m, and the center of mass $G$ of the driver (considered a particle) is 2 m above the road. Calculate the speed $v$ of the truck.",
+    "targets": { "v": 19.8 },
+    "required_units": ["m/s"]
   },
   {
-    "id": "CAL_5_7",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the volume under $z = xy$ over the region $0 \\le x \\le 2, 0 \\le y \\le 2$.",
-    "targets": { "Volume": 4.0 },
-    "required_units": [""]
+    "id": "K_2.3_3",
+    "category": "Kinematics: Normal & Tangent",
+    "statement": "The speed of a car increases uniformly with time from 50 km/h at $A$ to 100 km/h at $B$ during 10 seconds. The radius of curvature of the hump at $A$ is 40 m. If the magnitude of the total acceleration of the mass center of the car is the same at $B$ as at $A$, compute the radius of curvature $\\rho_B$ of the dip in the road at $B$. The mass center of the car is 0.6 m from the road.",
+    "targets": { "rho_B": 154.2 },
+    "required_units": ["m"]
   },
   {
-    "id": "CAL_5_8",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^1 \\int_x^1 dy dx$.",
-    "targets": { "Value": 0.5 },
-    "required_units": [""]
+    "id": "K_2.4_1",
+    "category": "Kinematics: Polar Coordinates",
+    "statement": "The position of the slider $P$ in the rotating slotted arm $OA$ is controlled by a power screw as shown. At the instant represented, $\\dot{\\theta} = 8$ rad/s and $\\ddot{\\theta} = -20$ rad/s$^2$. Also at this same instant, $r = 200$ mm, $\\dot{r} = -300$ mm/s, and $\\ddot{r} = 0$. For this instant determine the $r$- and $\\theta$-components of the acceleration of $P$.",
+    "targets": { "a_r": -12.8, "a_theta": -8.8 },
+    "required_units": ["m/s^2"]
   },
   {
-    "id": "CAL_5_9",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Calculate the double integral of $f(x,y) = 1$ over a circle of radius $r=2$. Use $\\pi = 3.142$.",
-    "targets": { "Area": 12.568 },
-    "required_units": [""]
+    "id": "K_2.4_2",
+    "category": "Kinematics: Polar Coordinates",
+    "statement": "A car $P$ travels along a straight road with a constant speed $v = 65$ mi/hr. At the instant when the angle $\\theta = 60^\\circ$, determine the values of $\\dot{r}$ in ft/sec and $\\dot{\\theta}$ in deg/sec.",
+    "targets": { "rdot": 82.5, "thetadot": 11.08 },
+    "required_units": ["ft/sec", "deg/sec"]
   },
   {
-    "id": "CAL_5_10",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^2 \\int_0^z \\int_0^y dx dy dz$.",
-    "targets": { "Value": 1.333 },
-    "required_units": [""]
+    "id": "K_2.4_3",
+    "category": "Kinematics: Polar Coordinates",
+    "statement": "The rocket is fired vertically and tracked by the radar station shown. When $\\theta$ reaches $60^\\circ$, other corresponding measurements give the values $r = 30,000$ ft, $\\ddot{r} = 70$ ft/sec$^2$, and $\\dot{\\theta} = 0.02$ rad/sec. Calculate the magnitudes of the velocity and acceleration of the rocket at this position.",
+    "targets": { "v": 1200, "a": 84.4 },
+    "required_units": ["ft/sec", "ft/sec^2"]
   },
   {
-    "id": "CAL_5_11",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the x-coordinate of the centroid ($\\bar{x}$) of a rectangle $0 \\le x \\le 4, 0 \\le y \\le 2$.",
-    "targets": { "x_bar": 2.0 },
-    "required_units": [""]
+    "id": "K_2.5_1",
+    "category": "Kinematics: Relative Motion",
+    "statement": "Car $A$ rounds a curve of 150-m radius at 54 km/h. Car $B$ is moving at 81 km/h but is slowing down at 3 m/s$^2$. Determine the magnitude of the velocity of $A$ relative to $B$ ($v_{A/B}$) at the instant when the paths are parallel.",
+    "targets": { "v_rel": 7.5 },
+    "required_units": ["m/s"]
   },
   {
-    "id": "CAL_5_12",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the y-coordinate of the centroid ($\\bar{y}$) of the same rectangle $0 \\le x \\le 4, 0 \\le y \\le 2$.",
-    "targets": { "y_bar": 1.0 },
-    "required_units": [""]
+    "id": "K_2.5_2",
+    "category": "Kinematics: Relative Motion",
+    "statement": "A small ship capable of making a speed of 6 knots through still water maintains a heading due east while being set to the south by an ocean current. The actual course of the boat is from A to B, a distance of 10 nautical miles that requires exactly 2 hours. Determine the speed $v_C$ of the current and its direction measured clockwise from the north.",
+    "targets": { "v_C": 4.0, "direction": 143.1 },
+    "required_units": ["knots", "deg"]
   },
   {
-    "id": "CAL_5_13",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Calculate the polar integral $\\int_0^{2\\pi} \\int_0^2 r dr d\\theta$. Use $\\pi = 3.142$.",
-    "targets": { "Value": 12.568 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_14",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^1 \\int_0^1 (x^2 + y^2) dx dy$.",
-    "targets": { "Value": 0.667 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_15",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the volume of a cube with side length 2 using triple integration.",
-    "targets": { "Volume": 8.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_16",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^1 \\int_0^{1-x} dy dx$.",
-    "targets": { "Value": 0.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_17",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the area of the region bounded by $y=x^2$ and $y=x$.",
-    "targets": { "Area": 0.167 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_18",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_1^2 \\int_1^2 \\frac{1}{xy} dx dy$. (Use $\\ln 2 = 0.693$)",
-    "targets": { "Value": 0.480 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_19",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the moment of inertia $I_x = \\iint y^2 dA$ for a rectangle $0 \\le x \\le 1, 0 \\le y \\le 3$.",
-    "targets": { "Ix": 9.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_20",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^3 \\int_0^2 4 dx dy$.",
-    "targets": { "Value": 24.0 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_21",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Calculate the mass of a plate $0 \\le x \\le 1, 0 \\le y \\le 1$ with density $\\rho(x,y) = x+y$.",
-    "targets": { "Mass": 1.0 },
-    "required_units": ["kg"]
-  },
-  {
-    "id": "CAL_5_22",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the volume under $z = 1 - x - y$ in the first octant.",
-    "targets": { "Volume": 0.167 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_23",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^{\\pi/2} \\int_0^{\\cos(\\theta)} r dr d\\theta$.",
-    "targets": { "Value": 0.196 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_24",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the area between $y=\\sqrt{x}$ and $y=x^2$ using double integration.",
-    "targets": { "Area": 0.333 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_25",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^1 \\int_0^1 \\int_0^1 (x+y+z) dx dy dz$.",
-    "targets": { "Value": 1.5 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_26",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the area of a circle $x^2 + y^2 = 9$ using polar coordinates. Use $\\pi = 3.142$.",
-    "targets": { "Area": 28.278 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_27",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_1^2 \\int_0^x y dy dx$.",
-    "targets": { "Value": 1.167 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_28",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Calculate the polar moment of inertia $J_o = \\iint (x^2 + y^2) dA$ for a circle of radius $R=1$. Use $\\pi = 3.142$.",
-    "targets": { "Jo": 1.571 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_29",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Evaluate $\\int_0^1 \\int_0^1 e^{x+y} dx dy$. (Use $e=2.718$)",
-    "targets": { "Value": 2.952 },
-    "required_units": [""]
-  },
-  {
-    "id": "CAL_5_30",
-    "category": "Mathematics: Calculus - Multiple Integrals",
-    "statement": "Find the volume of the region bounded by $z=x^2+y^2$ and the plane $z=1$. Use $\\pi = 3.142$.",
-    "targets": { "Volume": 1.571 },
-    "required_units": [""]
-  }
+    "id": "K_2.5_3",
+    "category": "Kinematics: Relative Motion",
+    "statement": "Starting from the relative position shown, aircraft B is to rendezvous with the refueling tanker A. If B is to arrive in close proximity to A in a two-minute time interval, what absolute velocity vector should B acquire and maintain? The velocity of the tanker A is 300 mi/hr along the constant-altitude path shown.",
+    "targets": { "v_Bx": 450, "v_By": 86.6 },
+    "required_units": ["mi/hr"]
+  }  
+ 
 ]
