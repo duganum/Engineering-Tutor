@@ -19,10 +19,12 @@ def get_gemini_model(system_instruction):
         st.error(f"Gemini 초기화 실패: {e}")
         return None
 
+@st.cache_data  # 성능 향상을 위해 캐싱 추가
 def load_problems():
-    """저장소의 JSON 파일에서 문제 목록을 불러옵니다."""
+    """Calculus 문제 은행(JSON)을 로드합니다."""
     try:
-        with open('problems_v2_GitHub.json', 'r') as f:
+        # 파일명을 'calculus_problems.json'으로 정확히 수정해야 합니다.
+        with open('calculus_problems.json', 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as e:
         st.error(f"problems.json 로드 에러: {e}")
